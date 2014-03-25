@@ -7,18 +7,21 @@ frame = 0
 zoomSpeed = 0.03
 
 imgResizeFactor = 0
-imageSelector = {}
-imageSelection = {}
-imageMouseCoords = {}
-zoomedMouseCoords = {}
+navigatorCursor =
+  zoom: 1
+  color: '#c35c18'
+navigatorSelection =
+  color: '#2dcf1f'
+navigatorMouseCoords = {}
+selectorMouseCoords = {}
 img = new Image()
 
-imageCanvas = $('canvas#navigator')
-imageCanvas[0].width = imageCanvas.parent().width()
-imageCanvas[0].height = 200
-zoomedCanvas = $('canvas#selector')
-zoomedCanvas[0].width = zoomedCanvas.parent().width()
-zoomedCanvas[0].height = 250
+navigatorCanvas = $('canvas#navigator')
+navigatorCanvas[0].width = navigatorCanvas.parent().width()
+navigatorCanvas[0].height = 200
+selectorCanvas = $('canvas#selector')
+selectorCanvas[0].width = selectorCanvas.parent().width()
+selectorCanvas[0].height = 250
 
 imagedata = $('#imagedata')
 fileSelect = $('#filepath')

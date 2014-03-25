@@ -3,19 +3,36 @@ app.controller 'appCtrl', [
   (scope) ->
     scope.sprites = []
 
+    scope.$watch 'imagedata', (imgData) ->
+      img.src = imgData
 
 
+    # listen for scroll events
+    navigatorCanvas.on 'mousewheel', (e) ->
+      e.preventDefault()
+      if e.deltaY
+        navigatorCursor.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
+        if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
+        if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
 
+    # load new image on file select
+    fileSelect.on 'change', (e) ->
+      selectedFile = e.target.files[0]
+      reader = new FileReader()
+      reader.onload = (e) ->
+        scope.$apply ->
+          scope.imagedata = e.target.result
+      reader.readAsDataURL selectedFile
 
     # image navigator framework
-    imageCq = cq(imageCanvas[0]).framework
+    navigatorCq = cq(navigatorCanvas[0]).framework
       onmouseup: ->
-        imageSelection.zoom   = imageSelector.zoom
-        imageSelection.x      = imageSelector.x
-        imageSelection.y      = imageSelector.y
+        navigatorSelection.zoom   = navigatorCursor.zoom
+        navigatorSelection.x      = navigatorCursor.x
+        navigatorSelection.y      = navigatorCursor.y
 
       onmousemove: (x, y) ->
-        imageMouseCoords =
+        navigatorMouseCoords =
           x : x
           y : y
       onrender: (delta, time) ->
@@ -33,10 +50,10 @@ app.controller 'appCtrl', [
 
           imgResizeFactor = Math.min(@canvas.height/img.height, @canvas.width/img.width)
 
-          imageSelector.width  = zoomedCq.canvas.width*imageSelector.zoom
-          imageSelector.height = zoomedCq.canvas.height*imageSelector.zoom
-          imageSelector.x      = imageMouseCoords.x-imageSelector.width/2
-          imageSelector.y      = imageMouseCoords.y-imageSelector.height/2
+          navigatorCursor.width  = selectorCq.canvas.width*navigatorCursor.zoom
+          navigatorCursor.height = selectorCq.canvas.height*navigatorCursor.zoom
+          navigatorCursor.x      = navigatorMouseCoords.x-navigatorCursor.width/2
+          navigatorCursor.y      = navigatorMouseCoords.y-navigatorCursor.height/2
 
           @save()
           .translate((@canvas.width-img.width*imgResizeFactor)/2, (@canvas.height-img.height*imgResizeFactor)/2)
@@ -45,35 +62,39 @@ app.controller 'appCtrl', [
 
           # draw view selector
           .save()
-          .translate(imageSelector.x,imageSelector.y)
+          .translate(navigatorCursor.x,navigatorCursor.y)
           .save()
           .globalAlpha(0.3)
-          .fillStyle(imageSelector.color)
-          .fillRect(0,0, imageSelector.width,imageSelector.height)
+          .fillStyle(navigatorCursor.color)
+          .fillRect(0,0, navigatorCursor.width,navigatorCursor.height)
           .restore()
-          .strokeStyle(imageSelector.color)
-          .strokeRect(0,0, imageSelector.width,imageSelector.height)
+          .strokeStyle(navigatorCursor.color)
+          .strokeRect(0,0, navigatorCursor.width,navigatorCursor.height)
           .restore()
 
           # draw view selection
-          if imageSelection.zoom?
+          if navigatorSelection.zoom?
             @save()
-            .translate(imageSelection.x,imageSelection.y)
+            .translate(navigatorSelection.x,navigatorSelection.y)
             .save()
             .globalAlpha(0.3)
-            .fillStyle(imageSelection.color)
-            .fillRect(0,0, zoomedCanvas.width()*imageSelection.zoom,zoomedCanvas.height()*imageSelection.zoom)
+            .fillStyle(navigatorSelection.color)
+            .fillRect(0,0, selectorCanvas.width()*navigatorSelection.zoom,selectorCanvas.height()*navigatorSelection.zoom)
             .restore()
-            .strokeStyle(imageSelection.color)
-            .strokeRect(0,0, zoomedCanvas.width()*imageSelection.zoom,zoomedCanvas.height()*imageSelection.zoom)
+            .strokeStyle(navigatorSelection.color)
+            .strokeRect(0,0, selectorCanvas.width()*navigatorSelection.zoom,selectorCanvas.height()*navigatorSelection.zoom)
             .restore()
+
+          if frame++ < 10
+            console.log selectorCq.canvas.width, navigatorCursor.zoom
+
 
 
 
     # zoomed view framework
-    zoomedCq = cq(zoomedCanvas[0]).framework
+    selectorCq = cq(selectorCanvas[0]).framework
       onmousemove: (x, y) ->
-        zoomedMouseCoords =
+        selectorMouseCoords =
           x: x
           y: y
 
@@ -89,15 +110,15 @@ app.controller 'appCtrl', [
         @clear()
         drawBackgroundTiles @
 
-        if imageSelection.zoom?
+        if navigatorSelection.zoom?
           @drawImage(
             # source
             img,
             # from coords and widths
-            ((imageSelection.x-(imageCanvas.width()-img.width*imgResizeFactor)/2) / imgResizeFactor),
-            ((imageSelection.y-(imageCanvas.height()-img.height*imgResizeFactor)/2) / imgResizeFactor),
-            (zoomedCanvas.width() * imageSelection.zoom) / imgResizeFactor,
-            (zoomedCanvas.height() * imageSelection.zoom) / imgResizeFactor,
+            ((navigatorSelection.x-(navigatorCanvas.width()-img.width*imgResizeFactor)/2) / imgResizeFactor),
+            ((navigatorSelection.y-(navigatorCanvas.height()-img.height*imgResizeFactor)/2) / imgResizeFactor),
+            (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor,
+            (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor,
             # to coords and widths
             0,
             0,
@@ -109,7 +130,7 @@ app.controller 'appCtrl', [
 
           if frame < 10 and img.width
             frame++
-            # console.log imageSelection.width, imageSelection.height, @canvas.width, @canvas.height
+            # console.log navigatorSelection.width, navigatorSelection.height, @canvas.width, @canvas.height
 
     scope.imagedata = fakeImageData
     scope.output = 'JSON\nhere'
