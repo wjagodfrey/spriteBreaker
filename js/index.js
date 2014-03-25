@@ -48,7 +48,7 @@
     return backgroundTile = cq().context.createPattern(tileImg, 'repeat');
   };
 
-  tileImg.src = '/img/tile.png';
+  tileImg.src = './img/tile.png';
 
   drawBackgroundTiles = function(ctx) {
     if (backgroundTile != null) {
