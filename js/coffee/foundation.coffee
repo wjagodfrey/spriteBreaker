@@ -3,7 +3,7 @@ backgroundTile = undefined
 tileImg = new Image()
 tileImg.onload = ->
   backgroundTile = cq().context.createPattern(tileImg,'repeat')
-tileImg.src = '/img/tile.png'
+tileImg.src = './img/tile.png'
 drawBackgroundTiles = (ctx) ->
   if backgroundTile?
     ctx
