@@ -1,0 +1,58 @@
+// vars
+blue = #29a4d3
+
+input_style
+  color blue
+// end vars
+
+body
+  margin 0
+
+canvas
+  cursor crosshair
+
+input[type=file]
+  width 100%
+
+
+.input-group
+  padding-top 10px
+
+.container
+  width 768px!important
+  margin 0 auto
+  // border 1px solid red
+
+#navigator_wrapper
+  margin-right 0
+  padding-right 0
+
+#form
+  margin 0
+  padding 0
+
+#imagedata
+  @extend input_style
+  border-top-right-radius 0
+  border-bottom-right-radius 0
+
+#filepath
+  @extend input_style
+
+output-height = 50px
+#output
+  resize none
+  height output-height
+#output-copy
+  padding 0
+  margin 0
+  button
+    padding-top 0
+    padding-bottom 0
+    height output-height
+    // height 100%
+
+#list
+  padding-left 0
+  .panel
+    height 100%

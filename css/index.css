@@ -1,0 +1,52 @@
+input_style,
+#imagedata,
+#filepath {
+  color: #29a4d3;
+}
+body {
+  margin: 0;
+}
+canvas {
+  cursor: crosshair;
+}
+input[type=file] {
+  width: 100%;
+}
+.input-group {
+  padding-top: 10px;
+}
+.container {
+  width: 768px !important;
+  margin: 0 auto;
+}
+#navigator_wrapper {
+  margin-right: 0;
+  padding-right: 0;
+}
+#form {
+  margin: 0;
+  padding: 0;
+}
+#imagedata {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#output {
+  resize: none;
+  height: 50px;
+}
+#output-copy {
+  padding: 0;
+  margin: 0;
+}
+#output-copy button {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 50px;
+}
+#list {
+  padding-left: 0;
+}
+#list .panel {
+  height: 100%;
+}

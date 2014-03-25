@@ -1,0 +1,73 @@
+doctype html
+
+html(ng-app="app" ng-controller="appCtrl")
+  meta(name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no")
+  head
+    title SpriteCutter - Wilfred James Godfrey
+    link(rel="stylesheet" type="text/css" href="./css/index.css")
+    link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
+  body
+
+    //- wrapper
+    .container
+      .row
+        //- left col
+        .col-xs-7
+          //- top row
+          .row
+            .col-xs-12
+              canvas#selector
+          //- bottom row
+          .row
+            //- bottom left navigator
+            .col-xs-6#navigator_wrapper
+              canvas#navigator
+            //- bottom left navigator
+            .col-xs-6
+              form#form
+                .input-group
+                  .input-group-addon
+                    span.glyphicon.glyphicon-floppy-open
+                  input(type="file", accept="image/*").form-control#filepath
+
+                .input-group
+                  .input-group-addon
+                    span.glyphicon.glyphicon-picture
+                  input(type="text" ng-model="imagedata").form-control#imagedata
+                  span.input-group-btn#imagedata-copy
+                    button(type="button" ng-click="copy(imagedata)").btn.btn-default.btn-group copy
+
+                //- label output
+                .input-group
+                  .input-group-addon
+                    span.glyphicon.glyphicon-floppy-save
+                  textarea(type="text" ng-model="output").form-control#output
+                  span.input-group-btn#output-copy
+                    button(type="button" ng-click="copy(output)").btn.btn-default.btn-group copy
+
+        //- right col
+        .col-xs-5
+          .row
+            .col-xs-12#list
+              .panel.panel-default
+                .panel.panel-default
+                  .panel-heading panel
+                  .panel.panel-default
+                    .panel-heading panel
+                    .list-group
+                      a.list-group-item yo
+                      a.list-group-item there
+                      a.list-group-item jim
+
+
+      .row
+
+
+
+
+    script(src="./js/angular.js")
+    script(src="./js/jquery-2.1.0.js")
+    script(src="./js/jquery.mousewheel.js")
+    script(src="./js/canvasquery.js")
+    script(src="./js/canvasquery.framework.js")
+    script(src="./js/index.js")
