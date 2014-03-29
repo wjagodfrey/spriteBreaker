@@ -1,22 +1,44 @@
 app.controller 'appCtrl', [
   '$scope'
   (scope) ->
-    scope.sprites =
-      mario:
-        actions:
-          walk:
+
+    ###
+    INIT
+    ###
+    scope.listSelection =
+      sprite : 'mario'
+      action : 'walk'
+      frame  : 0
+
+    #DEV
+    scope.sprites = [
+      {
+        name: 'mario'
+        actions: [
+          {
+            name: 'walk'
             frames: [
               [0,0,20,35]
             ]
-          jump:
+          }
+          {
+            name: 'jump'
             frames: [
-              [25,0,45,35]
+              [0,0,45,35]
             ]
+          }
+        ]
+      }
+    ]
 
+    # watch imagedata input for new imagedata
     scope.$watch 'imagedata', (imgData) ->
       reset()
       img.src = imgData
 
+    # keep output string updated
+    scope.$watch 'sprites', (sprites) ->
+      scope.output = JSON.stringify(sprites)
 
     # listen for scroll events
     navigatorCanvas.on 'mousewheel', (e) ->
@@ -35,7 +57,20 @@ app.controller 'appCtrl', [
           scope.imagedata = e.target.result
       reader.readAsDataURL selectedFile
 
-    # image navigator framework
+    ###
+    UTIL
+    ###
+    scope.getFrameImage = (dimensions) ->
+      result = getPNG img, dimensions
+      console.log result, dimensions
+      result
+    scope.addSprite = ->
+
+
+
+    ###
+    IMAGE NAVIGATOR FRAMEWORK
+    ###
     navigatorCq = cq(navigatorCanvas[0]).framework
       onmouseup: ->
         navigatorSelection.zoom   = navigatorCursor.zoom
@@ -84,7 +119,7 @@ app.controller 'appCtrl', [
           .restore()
 
           # draw view selection
-          if navigatorSelection.zoom?
+          if navigatorSelection.x? and navigatorSelection.y?
             @save()
             .translate(navigatorSelection.x,navigatorSelection.y)
             .save()
@@ -96,13 +131,10 @@ app.controller 'appCtrl', [
             .strokeRect(0,0, selectorCanvas.width()*navigatorSelection.zoom,selectorCanvas.height()*navigatorSelection.zoom)
             .restore()
 
-          if frame++ < 10
-            console.log selectorCq.canvas.width, navigatorCursor.zoom
 
-
-
-
-    # zoomed view framework
+    ###
+    ZOOMED VIEW FRAMEWORK
+    ###
     selectorCq = cq(selectorCanvas[0]).framework
       onmousemove: (x, y) ->
         selectorMouseCoords =
@@ -122,9 +154,9 @@ app.controller 'appCtrl', [
 
 
         @clear()
-        drawBackgroundTiles @, navigatorSelection.zoom or 1
+        drawBackgroundTiles @, navigatorSelection.zoom
 
-        if navigatorSelection.zoom?
+        if navigatorSelection.x? and navigatorSelection.y?
           @drawImage(
             # source
             img,
@@ -141,14 +173,15 @@ app.controller 'appCtrl', [
           )
 
 
+        #DEV
+        # if frame < 10
+        #   frame++
+        #   if frame is 9
+        #     console.log getPNG navigatorCq.canvas, [0,0,10,10]
 
-          if frame < 10 and img.width
-            frame++
-            # console.log navigatorSelection.width, navigatorSelection.height, @canvas.width, @canvas.height
 
+    #DEV
     scope.imagedata = fakeImageData
-    scope.output = 'JSON\nhere'
-    # imagedata.trigger 'change'
 
 
 ]

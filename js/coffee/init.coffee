@@ -7,11 +7,8 @@ frame = 0
 zoomSpeed = 0.03
 
 imgResizeFactor = 0
-navigatorCursor =
-  zoom: 1
-  color: '#c35c18'
-navigatorSelection =
-  color: '#2dcf1f'
+navigatorCursor = {}
+navigatorSelection = {}
 navigatorMouseCoords = {}
 selectorMouseCoords = {}
 img = new Image()

@@ -81,13 +81,18 @@ list_caret.open::before,
   content: '';
 }
 #list {
-  height: 460px;
+  height: 410px;
   overflow-y: scroll;
   border: 1px solid #bdc8d0;
   border-radius: 4px;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
+}
+#list input[type=text] {
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 #list .sprite {
   font-size: 1.5em;
@@ -99,13 +104,22 @@ list_caret.open::before,
 }
 #list .action {
   font-size: 1.2em;
-  padding-left: 20px;
+  padding-left: 10px;
   background: #e3a34a;
 }
 #list .action.open {
   background: #c8811f;
 }
 #list .frame {
-  padding-left: 30px;
+  padding-left: 10px;
   background: #8fc118;
+}
+#list .frame.selected {
+  background: #6b9112;
+}
+#list .frame img {
+  background: #fff;
+}
+#add_list {
+  height: 50px;
 }

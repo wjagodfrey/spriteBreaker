@@ -49,18 +49,20 @@ html(ng-app="app" ng-controller="appCtrl")
                   button(type="button").btn.btn-primary Load
 
         //- right col
-        .col-xs-5#list
+        .col-xs-5
+          .row#list
             div(
-              ng-repeat="(spriteName, actions) in sprites"
+              ng-repeat="sprite in sprites"
             )
 
               .sprite(
                 ng-init="open = true"
                 ng-click="open = !open"
                 ng-class="{open:open}"
-              ) {{spriteName}}
+              )
+                input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()')
               div(
-                ng-repeat="(actionName, frames) in actions"
+                ng-repeat="action in sprite.actions"
                 ng-show="$parent.open"
               )
 
@@ -68,13 +70,20 @@ html(ng-app="app" ng-controller="appCtrl")
                   ng-init="open = true"
                   ng-click="open = !open"
                   ng-class="{open:open}"
-                ) {{actionName}}
+                )
+                  input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()')
                 div(
-                  ng-repeat="(frameName, frameData) in frames"
+                  ng-repeat="(frameIndex, frameData) in action.frames"
                   ng-show="$parent.open"
                 )
 
-                  .frame{{frameName}}
+                  .frame(
+                    ng-class="{selected:listSelection.sprite==sprite.name&&listSelection.action==action.name&&listSelection.frame==frameIndex}"
+                    ng-click="$parent.$parent.listSelection={sprite:sprite.name,action:action.name,frame:frameIndex}"
+                  )
+                    img(ng-src="{{getFrameImage(frameData)}}")
+          .row#add_list
+            button(type="button" ng-click="addSprite()").btn.btn-primary.btn-block Add New Sprite
 
 
 

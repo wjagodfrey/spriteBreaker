@@ -19,9 +19,10 @@ drawBackgroundTiles = (ctx, zoom) ->
 reset = ->
   navigatorCursor =
     color : '#de683c'
-    zoom  : 0.1
+    zoom  : 0.3
   navigatorSelection =
     color: '#29a4d3'
+    zoom : 0.3
 
   navigatorMouseCoords =
     x: navigatorCanvas.innerWidth/2

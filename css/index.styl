@@ -90,17 +90,19 @@ list_caret
     border-left 7px solid transparent
     border-top-color white
     content ''
-  
 
 #list
-  // position relative
-  height 460px
+  height 410px
   overflow-y scroll
   border 1px solid grey_light
   border-radius 4px
   padding-left 0
   padding-right 0
   color white
+  input[type=text]
+    background transparent
+    border none
+    cursor pointer
   .sprite
     @extend list_caret
     @extend list_item
@@ -113,11 +115,18 @@ list_caret
     @extend list_caret
     @extend list_item
     font-size 1.2em
-    padding-left: 20px
+    padding-left: 10px
     background orange_light
     &.open
       background orange
   .frame
     @extend list_item
-    padding-left: 30px
+    padding-left: 10px
     background green
+    &.selected
+      background green_dark
+    img
+      background white
+
+#add_list
+  height 50px
