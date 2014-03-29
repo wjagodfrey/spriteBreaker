@@ -1,0 +1,37 @@
+{
+    "name": "spriteBreaker",
+    "version": "0.0.0",
+    "author": "Wilfred Godfrey <w.j.godfrey@gmail.com>",
+    "description": "An open source, web based spritesheet cutting GUI",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wilfredjamesgodfrey/spriteBreaker.git"
+    },
+    "keywords": [
+        "gamedev",
+        "sprite",
+        "sprites",
+        "spritesheet",
+        "game development",
+        "tool",
+        "GUI",
+        "simple",
+        "easy",
+        "web",
+        "HTML",
+        "HTML5",
+        "javascript"
+    ],
+    "dependencies": {
+        "coffee-script": "1.6.x",
+        "colors": "0.6.x",
+        "stylus": "0.37.x",
+        "nib": "1.0.x",
+        "jade": "0.35.x",
+        "connect": "2.14.x"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": ">=0.10.*"
+    }
+}

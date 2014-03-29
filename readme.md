@@ -1,11 +1,10 @@
-# Simple Stylus+Coffeescript project foundation
+# spriteBreaker
 
 ## Installation
-* ***npm install -g coffee-script***
-* ***npm install -g stylus***
-* ***npm install -g nib***
+* `clone`
+* `npm install`
 
-## Running
+## Development
 * Open two terminal windows
-* Terminal 1: ***bash build.bash***
-* Terminal 2: ***python -mSimpleHTTPServer <<port>>*** or equivalent
+* Terminal 1: `cake build`
+* Terminal 2: `cake start`
