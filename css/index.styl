@@ -1,9 +1,28 @@
 // vars
 blue = #29a4d3
+blue_light = lighten(blue, 25%)
+blue_dark  = darken(blue, 25%)
+
+orange = #c8811f
+orange_light = lighten(orange, 25%)
+orange_dark  = darken(orange, 25%)
+
+green = #8fc118
+green_light = lighten(green, 25%)
+green_dark  = darken(green, 25%)
+
+
+grey_light = #BDC8D0
 
 input_style
   color blue
 // end vars
+
+// util
+.caret.caret-reversed
+  border-top-width 0
+  border-bottom 4px solid #000000
+// end util
 
 body
   margin 0
@@ -50,9 +69,55 @@ output-height = 50px
     padding-top 0
     padding-bottom 0
     height output-height
-    // height 100%
+
+list_item
+  cursor pointer
+list_caret
+  &::before
+    margin-left -5px
+    margin-right 5px
+  &:not(.open)::before
+    display inline-block
+    border-right 7px solid transparent
+    border-bottom 7px solid white
+    border-left 7px solid transparent
+    border-bottom-color white
+    content ''
+  &.open::before
+    display inline-block
+    border-right 7px solid transparent
+    border-top 7px solid white
+    border-left 7px solid transparent
+    border-top-color white
+    content ''
+  
 
 #list
+  // position relative
+  height 460px
+  overflow-y scroll
+  border 1px solid grey_light
+  border-radius 4px
   padding-left 0
-  .panel
-    height 100%
+  padding-right 0
+  color white
+  .sprite
+    @extend list_caret
+    @extend list_item
+    font-size 1.5em
+    padding-left: 10px
+    background blue_light
+    &.open
+      background blue
+  .action
+    @extend list_caret
+    @extend list_item
+    font-size 1.2em
+    padding-left: 20px
+    background orange_light
+    &.open
+      background orange
+  .frame
+    @extend list_item
+    padding-left: 30px
+    background green

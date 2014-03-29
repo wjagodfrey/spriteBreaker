@@ -1,20 +1,25 @@
 # handle background tiles
 backgroundTile = undefined
 tileImg = new Image()
+tileSource = cq()
 tileImg.onload = ->
-  backgroundTile = cq().context.createPattern(tileImg,'repeat')
+  backgroundTile = tileSource.context.createPattern(tileImg,'repeat')
+  tileSource
+  .rect(0,0, 500,500)
+  .fillStyle(backgroundTile)
+  .fill()
 tileImg.src = './img/tile.png'
-drawBackgroundTiles = (ctx) ->
+drawBackgroundTiles = (ctx, zoom) ->
   if backgroundTile?
     ctx
-    .rect(0,0, ctx.canvas.width,ctx.canvas.height)
-    .fillStyle(backgroundTile)
-    .fill()
+    .save()
+    .drawImage(tileSource.canvas, 0,0, ctx.canvas.width*zoom,ctx.canvas.height*zoom, 0,0, ctx.canvas.width,ctx.canvas.height)
+    .restore()
 
 reset = ->
   navigatorCursor =
     color : '#de683c'
-    zoom  : 1
+    zoom  : 0.1
   navigatorSelection =
     color: '#29a4d3'
 
@@ -24,4 +29,3 @@ reset = ->
   selectorMouseCoords =
     x: 0
     y: 0
-

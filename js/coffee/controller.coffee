@@ -1,9 +1,20 @@
 app.controller 'appCtrl', [
   '$scope'
   (scope) ->
-    scope.sprites = []
+    scope.sprites =
+      mario:
+        actions:
+          walk:
+            frames: [
+              [0,0,20,35]
+            ]
+          jump:
+            frames: [
+              [25,0,45,35]
+            ]
 
     scope.$watch 'imagedata', (imgData) ->
+      reset()
       img.src = imgData
 
 
@@ -44,7 +55,7 @@ app.controller 'appCtrl', [
         @context.imageSmoothingEnabled = false
 
         @clear()
-        drawBackgroundTiles @
+        drawBackgroundTiles @, 1
         if img.src
 
 
@@ -98,6 +109,9 @@ app.controller 'appCtrl', [
           x: x
           y: y
 
+      onmouseon: (x, y) ->
+        console.log 'over'
+
       onrender: (delta, time) ->
 
         # make resizeds show pixel edges
@@ -108,7 +122,7 @@ app.controller 'appCtrl', [
 
 
         @clear()
-        drawBackgroundTiles @
+        drawBackgroundTiles @, navigatorSelection.zoom or 1
 
         if navigatorSelection.zoom?
           @drawImage(

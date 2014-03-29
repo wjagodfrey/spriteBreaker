@@ -3,7 +3,7 @@ doctype html
 html(ng-app="app" ng-controller="appCtrl")
   meta(name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no")
   head
-    title SpriteCutter - Wilfred James Godfrey
+    title SpriteBreaker - Wilfred James Godfrey
     link(rel="stylesheet" type="text/css" href="./css/index.css")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
   body
@@ -44,24 +44,37 @@ html(ng-app="app" ng-controller="appCtrl")
                   textarea(type="text" ng-model="output").form-control#output
                   span.input-group-btn#output-copy
                     button(type="button" ng-click="copy(output)").btn.btn-default.btn-group copy
+                .input-group
+                  button(type="button").btn.form.btn-primary Save
+                  button(type="button").btn.btn-primary Load
 
         //- right col
-        .col-xs-5
-          .row
-            .col-xs-12#list
-              .panel.panel-default
-                .panel.panel-default
-                  .panel-heading panel
-                  .panel.panel-default
-                    .panel-heading panel
-                    .list-group
-                      a.list-group-item yo
-                      a.list-group-item there
-                      a.list-group-item jim
+        .col-xs-5#list
+            div(
+              ng-repeat="(spriteName, actions) in sprites"
+            )
 
+              .sprite(
+                ng-init="open = true"
+                ng-click="open = !open"
+                ng-class="{open:open}"
+              ) {{spriteName}}
+              div(
+                ng-repeat="(actionName, frames) in actions"
+                ng-show="$parent.open"
+              )
 
-      .row
+                .action(
+                  ng-init="open = true"
+                  ng-click="open = !open"
+                  ng-class="{open:open}"
+                ) {{actionName}}
+                div(
+                  ng-repeat="(frameName, frameData) in frames"
+                  ng-show="$parent.open"
+                )
 
+                  .frame{{frameName}}
 
 
 

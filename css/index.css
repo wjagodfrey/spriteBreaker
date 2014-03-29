@@ -3,6 +3,10 @@ input_style,
 #filepath {
   color: #29a4d3;
 }
+.caret.caret-reversed {
+  border-top-width: 0;
+  border-bottom: 4px solid #000;
+}
 body {
   margin: 0;
 }
@@ -44,9 +48,64 @@ input[type=file] {
   padding-bottom: 0;
   height: 50px;
 }
-#list {
-  padding-left: 0;
+list_item,
+#list .sprite,
+#list .action,
+#list .frame {
+  cursor: pointer;
 }
-#list .panel {
-  height: 100%;
+list_caret::before,
+#list .sprite::before,
+#list .action::before {
+  margin-left: -5px;
+  margin-right: 5px;
+}
+list_caret:not(.open)::before,
+#list .sprite:not(.open)::before,
+#list .action:not(.open)::before {
+  display: inline-block;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid #fff;
+  border-left: 7px solid transparent;
+  border-bottom-color: #fff;
+  content: '';
+}
+list_caret.open::before,
+#list .sprite.open::before,
+#list .action.open::before {
+  display: inline-block;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #fff;
+  border-left: 7px solid transparent;
+  border-top-color: #fff;
+  content: '';
+}
+#list {
+  height: 460px;
+  overflow-y: scroll;
+  border: 1px solid #bdc8d0;
+  border-radius: 4px;
+  padding-left: 0;
+  padding-right: 0;
+  color: #fff;
+}
+#list .sprite {
+  font-size: 1.5em;
+  padding-left: 10px;
+  background: #5dbbe0;
+}
+#list .sprite.open {
+  background: #29a4d3;
+}
+#list .action {
+  font-size: 1.2em;
+  padding-left: 20px;
+  background: #e3a34a;
+}
+#list .action.open {
+  background: #c8811f;
+}
+#list .frame {
+  padding-left: 30px;
+  background: #8fc118;
 }
