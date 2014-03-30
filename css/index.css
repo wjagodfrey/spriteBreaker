@@ -151,7 +151,8 @@ list_caret.open::before,
   background: #fff;
 }
 #list .frame_header.selected {
-  border-left-color: #fd9b1f;
+  border-left-color: #ccf384;
+  background: #e5f9c2;
 }
 #add_list {
   height: 50px;

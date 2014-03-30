@@ -1,17 +1,27 @@
 // vars
 blue = #28a6e4
+blue_lightest = lighten(blue, 75%)
+blue_lighter = lighten(blue, 50%)
 blue_light = lighten(blue, 25%)
 blue_dark  = darken(blue, 25%)
+blue_darker  = darken(blue, 50%)
+blue_darkest  = darken(blue, 75%)
 
 orange = #fd9b1f
-orange_lightest = lighten(orange, 50%)
+orange_lightest = lighten(orange, 75%)
+orange_lighter = lighten(orange, 50%)
 orange_light = lighten(orange, 25%)
 orange_dark  = darken(orange, 25%)
-orange_darkest  = darken(orange, 50%)
+orange_darker  = darken(orange, 50%)
+orange_darkest  = darken(orange, 75%)
 
 green = #95da16
+green_lightest = lighten(green, 75%)
+green_lighter = lighten(green, 50%)
 green_light = lighten(green, 25%)
 green_dark  = darken(green, 25%)
+green_darker  = darken(green, 50%)
+green_darkest  = darken(green, 75%)
 
 
 grey_light = #BDC8D0
@@ -154,12 +164,13 @@ list_caret
   .frame_header
     @extend list_item
     padding-left: 30px
-    background orange_lightest
-    border-left 20px solid orange_lightest
+    background orange_lighter
+    border-left 20px solid orange_lighter
     img
       background white
     &.selected
-      border-left-color orange
+      border-left-color green_lighter
+      background green_lightest
 
 #add_list
   height 50px

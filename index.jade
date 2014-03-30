@@ -85,8 +85,8 @@ html(ng-app="app" ng-controller="appCtrl")
                 ).frame
 
                   .frame_header(
-                    ng-click="$parent.$parent.listSelection={sprite:sprite.name,action:action.name,frame:frameIndex}"
-                    ng-class="{selected:listSelection.sprite==sprite.name&&listSelection.action==action.name&&listSelection.frame==frameIndex}"
+                    ng-click="$parent.$parent.$parent.listSelection={sprite:spriteIndex,action:actionIndex,frame:frameIndex}"
+                    ng-class="{selected:listSelection.sprite==spriteIndex&&listSelection.action==actionIndex&&listSelection.frame==frameIndex}"
                   )
                     img(ng-src="{{getFrameImage(frameData, 50, 50)}}")
                     .button_wrapper

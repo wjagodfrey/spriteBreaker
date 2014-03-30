@@ -23,6 +23,9 @@ reset = ->
   navigatorSelection =
     color: '#29a4d3'
     zoom : 0.3
+    #DEV
+    x: 0
+    y: 0
 
   navigatorMouseCoords =
     x: navigatorCanvas.innerWidth/2

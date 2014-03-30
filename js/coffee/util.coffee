@@ -11,8 +11,6 @@ PNGCanvas = cq()
   selectionWidth = coords[2] = if coords[2]? then coords[2] else canvas.width
   selectionHeight = coords[3] = if coords[3]? then coords[3] else canvas.height
 
-  console.log selectionWidth, selectionHeight
-
   width ?= selectionWidth
   height ?= selectionHeight
 
@@ -32,7 +30,7 @@ PNGCanvas = cq()
 
   .save()
   .translate((PNGCanvas.canvas.width-selectionWidth*imgResizeFactor)/2, (PNGCanvas.canvas.height-selectionHeight*imgResizeFactor)/2)
-  .drawImage(canvas, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor)
+  .drawImage(canvas, selectionX,selectionY, selectionWidth, selectionHeight, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor)
   # .drawImage(canvas, 0,0, selectionWidth * imgResizeFactor, selectionHeight)
   .restore()
 

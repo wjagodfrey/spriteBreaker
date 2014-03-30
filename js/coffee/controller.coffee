@@ -7,8 +7,8 @@ app.controller 'appCtrl', [
     INIT
     ###
     scope.listSelection =
-      sprite : 'mario'
-      action : 'walk'
+      sprite : 0
+      action : 0
       frame  : 0
 
 
@@ -26,7 +26,7 @@ app.controller 'appCtrl', [
             {
               name: 'walk'
               frames: [
-                [0,0,20,35]
+                [10,10,20,35]
               ]
             }
             {
@@ -76,7 +76,7 @@ app.controller 'appCtrl', [
       # select new input
       timeout ->
         $('.sprite_header input')
-        .eq(scope.sprites.length-1)
+        .eq(scope.sprites.length - 1)
         .select()
     scope.removeSprite = (spriteIndex) ->
       scope.sprites.splice(spriteIndex, 1)
@@ -90,7 +90,7 @@ app.controller 'appCtrl', [
         $('.sprite')
         .eq(spriteIndex)
         .find('.action_header input')
-        .eq(scope.sprites[spriteIndex].actions.length-1)
+        .eq(scope.sprites[spriteIndex].actions.length - 1)
         .select()
     scope.removeAction = (spriteIndex, actionIndex) ->
       scope.sprites[spriteIndex].actions.splice(actionIndex, 1)
@@ -127,15 +127,15 @@ app.controller 'appCtrl', [
         if img.src
 
 
-          imgResizeFactor = Math.min(@canvas.height/img.height, @canvas.width/img.width)
+          imgResizeFactor = Math.min(@canvas.height / img.height, @canvas.width / img.width)
 
-          navigatorCursor.width  = selectorCq.canvas.width*navigatorCursor.zoom
-          navigatorCursor.height = selectorCq.canvas.height*navigatorCursor.zoom
-          navigatorCursor.x      = navigatorMouseCoords.x-navigatorCursor.width/2
-          navigatorCursor.y      = navigatorMouseCoords.y-navigatorCursor.height/2
+          navigatorCursor.width  = selectorCq.canvas.width * navigatorCursor.zoom
+          navigatorCursor.height = selectorCq.canvas.height * navigatorCursor.zoom
+          navigatorCursor.x      = navigatorMouseCoords.x - navigatorCursor.width / 2
+          navigatorCursor.y      = navigatorMouseCoords.y - navigatorCursor.height / 2
 
           @save()
-          .translate((@canvas.width-img.width*imgResizeFactor)/2, (@canvas.height-img.height*imgResizeFactor)/2)
+          .translate((@canvas.width - img.width * imgResizeFactor) / 2, (@canvas.height - img.height * imgResizeFactor) / 2)
           .drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor)
           .restore()
 
@@ -158,10 +158,10 @@ app.controller 'appCtrl', [
             .save()
             .globalAlpha(0.3)
             .fillStyle(navigatorSelection.color)
-            .fillRect(0,0, selectorCanvas.width()*navigatorSelection.zoom,selectorCanvas.height()*navigatorSelection.zoom)
+            .fillRect(0,0, selectorCanvas.width() * navigatorSelection.zoom,selectorCanvas.height() * navigatorSelection.zoom)
             .restore()
             .strokeStyle(navigatorSelection.color)
-            .strokeRect(0,0, selectorCanvas.width()*navigatorSelection.zoom,selectorCanvas.height()*navigatorSelection.zoom)
+            .strokeRect(0,0, selectorCanvas.width() * navigatorSelection.zoom,selectorCanvas.height() * navigatorSelection.zoom)
             .restore()
 
 
@@ -173,9 +173,6 @@ app.controller 'appCtrl', [
         selectorMouseCoords =
           x: x
           y: y
-
-      onmouseon: (x, y) ->
-        console.log 'over'
 
       onrender: (delta, time) ->
 
@@ -194,8 +191,8 @@ app.controller 'appCtrl', [
             # source
             img,
             # from coords and widths
-            ((navigatorSelection.x-(navigatorCanvas.width()-img.width*imgResizeFactor)/2) / imgResizeFactor),
-            ((navigatorSelection.y-(navigatorCanvas.height()-img.height*imgResizeFactor)/2) / imgResizeFactor),
+            (navigatorSelection.x - (navigatorCanvas.width() - img.width * imgResizeFactor) / 2) / imgResizeFactor,
+            (navigatorSelection.y - (navigatorCanvas.height() - img.height * imgResizeFactor) / 2) / imgResizeFactor,
             (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor,
             (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor,
             # to coords and widths
@@ -206,11 +203,37 @@ app.controller 'appCtrl', [
           )
 
 
-        #DEV
-        # if frame < 10
-        #   frame++
-        #   if frame is 9
-        #     console.log getPNG navigatorCq.canvas, [0,0,10,10]
+          for spriteIndex, sprite of scope.sprites
+            for actionIndex, action of sprite.actions
+              for frameIndex, frame of action.frames
+
+                spriteIndex = parseInt spriteIndex
+                actionIndex = parseInt actionIndex
+                frameIndex = parseInt frameIndex
+
+                frameX = (frame[0]) / navigatorSelection.zoom
+                frameY = (frame[1]) / navigatorSelection.zoom
+                frameWidth = frame[2] / navigatorSelection.zoom
+                frameHeight = frame[3] / navigatorSelection.zoom
+
+                selected  = scope.listSelection.sprite is spriteIndex and scope.listSelection.action is actionIndex and scope.listSelection.frame is frameIndex
+                frameColor = if selected then '#c80819' else '#21d4cc'
+
+                @save()
+                .translate(frameX,frameY)
+
+                .save()
+                .globalAlpha(0.3)
+                .fillStyle(frameColor)
+                .fillRect(0,0, frameWidth,frameHeight)
+                .restore()
+
+                .strokeStyle(frameColor)
+                .strokeRect(0,0, frameWidth,frameHeight)
+                .restore()
+
+
+
 
 
     #DEV
