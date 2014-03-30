@@ -1,6 +1,7 @@
 app.controller 'appCtrl', [
   '$scope'
-  (scope) ->
+  '$timeout'
+  (scope, timeout) ->
 
     ###
     INIT
@@ -10,35 +11,39 @@ app.controller 'appCtrl', [
       action : 'walk'
       frame  : 0
 
-    #DEV
-    scope.sprites = [
-      {
-        name: 'mario'
-        actions: [
-          {
-            name: 'walk'
-            frames: [
-              [0,0,20,35]
-            ]
-          }
-          {
-            name: 'jump'
-            frames: [
-              [0,0,45,35]
-            ]
-          }
-        ]
-      }
-    ]
 
     # watch imagedata input for new imagedata
     scope.$watch 'imagedata', (imgData) ->
       reset()
+      scope.sprites = []
       img.src = imgData
+
+      #DEV
+      scope.sprites = [
+        {
+          name: 'mario'
+          actions: [
+            {
+              name: 'walk'
+              frames: [
+                [0,0,20,35]
+              ]
+            }
+            {
+              name: 'jump'
+              frames: [
+                [0,0,45,35]
+              ]
+            }
+          ]
+        }
+      ]
+
 
     # keep output string updated
     scope.$watch 'sprites', (sprites) ->
       scope.output = JSON.stringify(sprites)
+    , true
 
     # listen for scroll events
     navigatorCanvas.on 'mousewheel', (e) ->
@@ -60,12 +65,40 @@ app.controller 'appCtrl', [
     ###
     UTIL
     ###
-    scope.getFrameImage = (dimensions) ->
-      result = getPNG img, dimensions
-      console.log result, dimensions
+    scope.getFrameImage = (dimensions, width, height) ->
+      result = getPNG img, dimensions, width, height
       result
-    scope.addSprite = ->
 
+    scope.addSprite = ->
+      scope.sprites.push
+        name: 'new sprite'
+        actions: []
+      # select new input
+      timeout ->
+        $('.sprite_header input')
+        .eq(scope.sprites.length-1)
+        .select()
+    scope.removeSprite = (spriteIndex) ->
+      scope.sprites.splice(spriteIndex, 1)
+
+    scope.addAction = (spriteIndex) ->
+      scope.sprites[spriteIndex].actions.push
+        name: 'new action'
+        frames: []
+      # select new input
+      timeout ->
+        $('.sprite')
+        .eq(spriteIndex)
+        .find('.action_header input')
+        .eq(scope.sprites[spriteIndex].actions.length-1)
+        .select()
+    scope.removeAction = (spriteIndex, actionIndex) ->
+      scope.sprites[spriteIndex].actions.splice(actionIndex, 1)
+
+    scope.addFrame = (spriteIndex,actionIndex) ->
+      scope.sprites[spriteIndex].actions[actionIndex].frames.push [0,0,1,10]
+    scope.removeFrame = (spriteIndex, actionIndex, frameIndex) ->
+      scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1)
 
 
     ###

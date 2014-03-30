@@ -9,25 +9,27 @@ GLOBAL UTIL
 
   PNGCanvas = cq();
 
-  this.getPNG = function(canvas, coords) {
+  this.getPNG = function(canvas, coords, width, height) {
+    var imgResizeFactor, selectionHeight, selectionWidth, selectionX, selectionY;
     if (!coords) {
       coords = [];
     }
-    if (coords[0] == null) {
-      coords[0] = 0;
+    selectionX = coords[0] != null ? coords[0] : coords[0] = 0;
+    selectionY = coords[1] != null ? coords[1] : coords[1] = 0;
+    selectionWidth = coords[2] = coords[2] != null ? coords[2] : canvas.width;
+    selectionHeight = coords[3] = coords[3] != null ? coords[3] : canvas.height;
+    console.log(selectionWidth, selectionHeight);
+    if (width == null) {
+      width = selectionWidth;
     }
-    if (coords[1] == null) {
-      coords[1] = 0;
+    if (height == null) {
+      height = selectionHeight;
     }
-    if (coords[2] == null) {
-      coords[2] = canvas.width;
-    }
-    if (coords[3] == null) {
-      coords[3] = canvas.height;
-    }
-    PNGCanvas.canvas.width = coords[2];
-    PNGCanvas.canvas.height = coords[3];
-    PNGCanvas.clear().drawImage(canvas, coords[0], coords[1], coords[2], coords[3], 0, 0, coords[2], coords[3]);
+    PNGCanvas.canvas.width = width;
+    PNGCanvas.canvas.height = height;
+    PNGCanvas.context.mozImageSmoothingEnabled = PNGCanvas.context.webkitImageSmoothingEnabled = PNGCanvas.context.msImageSmoothingEnabled = PNGCanvas.context.imageSmoothingEnabled = false;
+    imgResizeFactor = Math.min(PNGCanvas.canvas.height / selectionHeight, PNGCanvas.canvas.width / selectionWidth);
+    PNGCanvas.clear().save().translate((PNGCanvas.canvas.width - selectionWidth * imgResizeFactor) / 2, (PNGCanvas.canvas.height - selectionHeight * imgResizeFactor) / 2).drawImage(canvas, 0, 0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor, 0, 0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor).restore();
     return PNGCanvas.canvas.toDataURL();
   };
 
@@ -108,7 +110,7 @@ GLOBAL UTIL
   };
 
   app.controller('appCtrl', [
-    '$scope', function(scope) {
+    '$scope', '$timeout', function(scope, timeout) {
 
       /*
       INIT
@@ -119,27 +121,28 @@ GLOBAL UTIL
         action: 'walk',
         frame: 0
       };
-      scope.sprites = [
-        {
-          name: 'mario',
-          actions: [
-            {
-              name: 'walk',
-              frames: [[0, 0, 20, 35]]
-            }, {
-              name: 'jump',
-              frames: [[0, 0, 45, 35]]
-            }
-          ]
-        }
-      ];
       scope.$watch('imagedata', function(imgData) {
         reset();
-        return img.src = imgData;
+        scope.sprites = [];
+        img.src = imgData;
+        return scope.sprites = [
+          {
+            name: 'mario',
+            actions: [
+              {
+                name: 'walk',
+                frames: [[0, 0, 20, 35]]
+              }, {
+                name: 'jump',
+                frames: [[0, 0, 45, 35]]
+              }
+            ]
+          }
+        ];
       });
       scope.$watch('sprites', function(sprites) {
         return scope.output = JSON.stringify(sprites);
-      });
+      }, true);
       navigatorCanvas.on('mousewheel', function(e) {
         e.preventDefault();
         if (e.deltaY) {
@@ -167,13 +170,41 @@ GLOBAL UTIL
       /*
       UTIL
        */
-      scope.getFrameImage = function(dimensions) {
+      scope.getFrameImage = function(dimensions, width, height) {
         var result;
-        result = getPNG(img, dimensions);
-        console.log(result, dimensions);
+        result = getPNG(img, dimensions, width, height);
         return result;
       };
-      scope.addSprite = function() {};
+      scope.addSprite = function() {
+        scope.sprites.push({
+          name: 'new sprite',
+          actions: []
+        });
+        return timeout(function() {
+          return $('.sprite_header input').eq(scope.sprites.length - 1).select();
+        });
+      };
+      scope.removeSprite = function(spriteIndex) {
+        return scope.sprites.splice(spriteIndex, 1);
+      };
+      scope.addAction = function(spriteIndex) {
+        scope.sprites[spriteIndex].actions.push({
+          name: 'new action',
+          frames: []
+        });
+        return timeout(function() {
+          return $('.sprite').eq(spriteIndex).find('.action_header input').eq(scope.sprites[spriteIndex].actions.length - 1).select();
+        });
+      };
+      scope.removeAction = function(spriteIndex, actionIndex) {
+        return scope.sprites[spriteIndex].actions.splice(actionIndex, 1);
+      };
+      scope.addFrame = function(spriteIndex, actionIndex) {
+        return scope.sprites[spriteIndex].actions[actionIndex].frames.push([0, 0, 1, 10]);
+      };
+      scope.removeFrame = function(spriteIndex, actionIndex, frameIndex) {
+        return scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1);
+      };
 
       /*
       IMAGE NAVIGATOR FRAMEWORK

@@ -1,13 +1,15 @@
 // vars
-blue = #29a4d3
+blue = #28a6e4
 blue_light = lighten(blue, 25%)
 blue_dark  = darken(blue, 25%)
 
-orange = #c8811f
+orange = #fd9b1f
+orange_lightest = lighten(orange, 50%)
 orange_light = lighten(orange, 25%)
 orange_dark  = darken(orange, 25%)
+orange_darkest  = darken(orange, 50%)
 
-green = #8fc118
+green = #95da16
 green_light = lighten(green, 25%)
 green_dark  = darken(green, 25%)
 
@@ -72,6 +74,7 @@ output-height = 50px
 
 list_item
   cursor pointer
+  padding 3px
 list_caret
   &::before
     margin-left -5px
@@ -99,34 +102,64 @@ list_caret
   padding-left 0
   padding-right 0
   color white
+
+  .button_wrapper
+    clear both
+    display inline
+  button[type=button]
+    float right
+    margin 1.5px
+    margin-top 6px
   input[type=text]
-    background transparent
+    width 90px
     border none
     cursor pointer
+    display inline-block
+    color white
+    &:focus
+      background white!important
+      cursor text
+
   .sprite
+    margin-top 10px
+  .sprite:first-of-type
+    margin-top 0
+
+  .sprite_header
     @extend list_caret
     @extend list_item
-    font-size 1.5em
     padding-left: 10px
-    background blue_light
-    &.open
-      background blue
-  .action
-    @extend list_caret
-    @extend list_item
-    font-size 1.2em
-    padding-left: 10px
-    background orange_light
+    background orange
+    input[type=text]
+      background orange_dark
+      &:focus
+        color orange_dark
     &.open
       background orange
-  .frame
+
+
+  .action_header
+    @extend list_caret
     @extend list_item
-    padding-left: 10px
-    background green
-    &.selected
-      background green_dark
+    padding-left: 30px
+    background orange_light
+    input[type=text]
+      background orange_dark
+      &:focus
+        color orange_dark
+    &.open
+      background orange_light
+
+
+  .frame_header
+    @extend list_item
+    padding-left: 30px
+    background orange_lightest
+    border-left 20px solid orange_lightest
     img
       background white
+    &.selected
+      border-left-color orange
 
 #add_list
   height 50px

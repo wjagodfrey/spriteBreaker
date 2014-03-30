@@ -52,38 +52,47 @@ html(ng-app="app" ng-controller="appCtrl")
         .col-xs-5
           .row#list
             div(
-              ng-repeat="sprite in sprites"
-            )
+              ng-repeat="(spriteIndex, sprite) in sprites"
+            ).sprite
 
-              .sprite(
+              .sprite_header(
                 ng-init="open = true"
                 ng-click="open = !open"
                 ng-class="{open:open}"
               )
-                input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()')
-              div(
-                ng-repeat="action in sprite.actions"
-                ng-show="$parent.open"
-              )
+                input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control
+                .button_wrapper
+                  button(type="button" ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
+                  button(type="button" ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
 
-                .action(
+              div(
+                ng-repeat="(actionIndex, action) in sprite.actions"
+                ng-show="$parent.open"
+              ).action
+
+                .action_header(
                   ng-init="open = true"
                   ng-click="open = !open"
                   ng-class="{open:open}"
                 )
-                  input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()')
+                  input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control
+                  .button_wrapper
+                    button(type="button" ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
+                    button(type="button" ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
                 div(
                   ng-repeat="(frameIndex, frameData) in action.frames"
                   ng-show="$parent.open"
-                )
+                ).frame
 
-                  .frame(
-                    ng-class="{selected:listSelection.sprite==sprite.name&&listSelection.action==action.name&&listSelection.frame==frameIndex}"
+                  .frame_header(
                     ng-click="$parent.$parent.listSelection={sprite:sprite.name,action:action.name,frame:frameIndex}"
+                    ng-class="{selected:listSelection.sprite==sprite.name&&listSelection.action==action.name&&listSelection.frame==frameIndex}"
                   )
-                    img(ng-src="{{getFrameImage(frameData)}}")
+                    img(ng-src="{{getFrameImage(frameData, 50, 50)}}")
+                    .button_wrapper
+                      button(type="button" ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
           .row#add_list
-            button(type="button" ng-click="addSprite()").btn.btn-primary.btn-block Add New Sprite
+            button(type="button" ng-click="addSprite()").btn.btn-info.btn-block + sprite
 
 
 

@@ -1,7 +1,7 @@
 input_style,
 #imagedata,
 #filepath {
-  color: #29a4d3;
+  color: #28a6e4;
 }
 .caret.caret-reversed {
   border-top-width: 0;
@@ -49,20 +49,21 @@ input[type=file] {
   height: 50px;
 }
 list_item,
-#list .sprite,
-#list .action,
-#list .frame {
+#list .sprite_header,
+#list .action_header,
+#list .frame_header {
   cursor: pointer;
+  padding: 3px;
 }
 list_caret::before,
-#list .sprite::before,
-#list .action::before {
+#list .sprite_header::before,
+#list .action_header::before {
   margin-left: -5px;
   margin-right: 5px;
 }
 list_caret:not(.open)::before,
-#list .sprite:not(.open)::before,
-#list .action:not(.open)::before {
+#list .sprite_header:not(.open)::before,
+#list .action_header:not(.open)::before {
   display: inline-block;
   border-right: 7px solid transparent;
   border-bottom: 7px solid #fff;
@@ -71,8 +72,8 @@ list_caret:not(.open)::before,
   content: '';
 }
 list_caret.open::before,
-#list .sprite.open::before,
-#list .action.open::before {
+#list .sprite_header.open::before,
+#list .action_header.open::before {
   display: inline-block;
   border-right: 7px solid transparent;
   border-top: 7px solid #fff;
@@ -89,36 +90,68 @@ list_caret.open::before,
   padding-right: 0;
   color: #fff;
 }
+#list .button_wrapper {
+  clear: both;
+  display: inline;
+}
+#list button[type=button] {
+  float: right;
+  margin: 1.5px;
+  margin-top: 6px;
+}
 #list input[type=text] {
-  background: transparent;
+  width: 90px;
   border: none;
   cursor: pointer;
+  display: inline-block;
+  color: #fff;
+}
+#list input[type=text]:focus {
+  background: #fff !important;
+  cursor: text;
 }
 #list .sprite {
-  font-size: 1.5em;
+  margin-top: 10px;
+}
+#list .sprite:first-of-type {
+  margin-top: 0;
+}
+#list .sprite_header {
   padding-left: 10px;
-  background: #5dbbe0;
+  background: #fd9b1f;
 }
-#list .sprite.open {
-  background: #29a4d3;
+#list .sprite_header input[type=text] {
+  background: #d37702;
 }
-#list .action {
-  font-size: 1.2em;
-  padding-left: 10px;
-  background: #e3a34a;
+#list .sprite_header input[type=text]:focus {
+  color: #d37702;
 }
-#list .action.open {
-  background: #c8811f;
+#list .sprite_header.open {
+  background: #fd9b1f;
 }
-#list .frame {
-  padding-left: 10px;
-  background: #8fc118;
+#list .action_header {
+  padding-left: 30px;
+  background: #feb457;
 }
-#list .frame.selected {
-  background: #6b9112;
+#list .action_header input[type=text] {
+  background: #d37702;
 }
-#list .frame img {
+#list .action_header input[type=text]:focus {
+  color: #d37702;
+}
+#list .action_header.open {
+  background: #feb457;
+}
+#list .frame_header {
+  padding-left: 30px;
+  background: #fecd8f;
+  border-left: 20px solid #fecd8f;
+}
+#list .frame_header img {
   background: #fff;
+}
+#list .frame_header.selected {
+  border-left-color: #fd9b1f;
 }
 #add_list {
   height: 50px;

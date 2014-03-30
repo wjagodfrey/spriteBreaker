@@ -3,17 +3,40 @@ GLOBAL UTIL
 ###
 
 PNGCanvas = cq()
-@getPNG = (canvas, coords) ->
+@getPNG = (canvas, coords, width, height) ->
   if !coords then coords = []
-  coords[0] ?= 0
-  coords[1] ?= 0
-  coords[2] ?= canvas.width
-  coords[3] ?= canvas.height
+  selectionX = coords[0] ?= 0
+  selectionY = coords[1] ?= 0
+  # have to make sure not to overwrite 0s
+  selectionWidth = coords[2] = if coords[2]? then coords[2] else canvas.width
+  selectionHeight = coords[3] = if coords[3]? then coords[3] else canvas.height
 
+  console.log selectionWidth, selectionHeight
 
-  PNGCanvas.canvas.width = coords[2]
-  PNGCanvas.canvas.height = coords[3]
+  width ?= selectionWidth
+  height ?= selectionHeight
+
+  PNGCanvas.canvas.width = width
+  PNGCanvas.canvas.height = height
+
+  # make resizeds show pixel edges
+  PNGCanvas.context.mozImageSmoothingEnabled =
+  PNGCanvas.context.webkitImageSmoothingEnabled =
+  PNGCanvas.context.msImageSmoothingEnabled =
+  PNGCanvas.context.imageSmoothingEnabled = false
+
+  imgResizeFactor = Math.min(PNGCanvas.canvas.height/selectionHeight, PNGCanvas.canvas.width/selectionWidth)
+
   PNGCanvas
   .clear()
-  .drawImage(canvas, coords[0],coords[1],coords[2],coords[3], 0,0,coords[2],coords[3])
+
+  .save()
+  .translate((PNGCanvas.canvas.width-selectionWidth*imgResizeFactor)/2, (PNGCanvas.canvas.height-selectionHeight*imgResizeFactor)/2)
+  .drawImage(canvas, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor)
+  # .drawImage(canvas, 0,0, selectionWidth * imgResizeFactor, selectionHeight)
+  .restore()
+
+
+
+  # .drawImage(canvas, coords[0],coords[1],coords[2],coords[3], 0,0,width,height)
   PNGCanvas.canvas.toDataURL()
