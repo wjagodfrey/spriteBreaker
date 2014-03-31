@@ -5,7 +5,7 @@ GLOBAL UTIL
  */
 
 (function() {
-  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fakeImageData, fileSelect, imagedata, img, imgResizeFactor, jsonoutput, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, tileImg, tileSource, zoomSpeed;
+  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fakeImageData, fileSelect, imagedata, img, imgResizeFactor, jsonoutput, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, tileImg, tileSource, zoomSpeed;
 
   PNGCanvas = cq();
 
@@ -45,6 +45,8 @@ GLOBAL UTIL
   navigatorCursor = {};
 
   navigatorSelection = {};
+
+  mouseOverNavigator = false;
 
   navigatorMouseCoords = {};
 
@@ -97,7 +99,7 @@ GLOBAL UTIL
     navigatorSelection = {
       color: '#29a4d3',
       zoom: 0.3,
-      x: 0,
+      x: -10,
       y: 0
     };
     navigatorMouseCoords = {
@@ -116,8 +118,8 @@ GLOBAL UTIL
       /*
       INIT
        */
-      var navigatorCq, selectorCq;
-      scope.listSelection = {
+      var horizontalEdgeAdjustment, navigatorCq, selectorCq, verticalEdgeAdjustment;
+      scope.selectedFrame = {
         sprite: 0,
         action: 0,
         frame: 0
@@ -125,25 +127,27 @@ GLOBAL UTIL
       scope.$watch('imagedata', function(imgData) {
         reset();
         scope.sprites = [];
-        img.src = imgData;
-        return scope.sprites = [
-          {
-            name: 'mario',
-            actions: [
-              {
-                name: 'walk',
-                frames: [[10, 10, 20, 35]]
-              }, {
-                name: 'jump',
-                frames: [[0, 0, 45, 35]]
-              }
-            ]
-          }
-        ];
+        return img.src = imgData;
       });
+
+      /*
+      LISTENERS
+       */
       scope.$watch('sprites', function(sprites) {
         return scope.output = JSON.stringify(sprites);
       }, true);
+      $(window).on('blur', function() {
+        return mouseOverNavigator = false;
+      });
+      $('canvas').on('contextmenu', function(e) {
+        return e.preventDefault();
+      });
+      navigatorCanvas.on('mouseover', function(e) {
+        return mouseOverNavigator = true;
+      });
+      navigatorCanvas.on('mouseout', function(e) {
+        return mouseOverNavigator = false;
+      });
       navigatorCanvas.on('mousewheel', function(e) {
         e.preventDefault();
         if (e.deltaY) {
@@ -171,6 +175,23 @@ GLOBAL UTIL
       /*
       UTIL
        */
+      scope.getSelected = function() {
+        var r;
+        r = scope.selectedFrame;
+        return scope.sprites[r.sprite].actions[r.action].frames[r.frame];
+      };
+      scope.setSelected = function(sprite, action, frame) {
+        return scope.selectedFrame = {
+          sprite: sprite,
+          action: action,
+          frame: frame
+        };
+      };
+      scope.isSelected = function(sprite, action, frame) {
+        var s;
+        s = scope.selectedFrame;
+        return s.frame === frame && s.action === action && s.frame === frame;
+      };
       scope.getFrameImage = function(dimensions, width, height) {
         var result;
         result = getPNG(img, dimensions, width, height);
@@ -178,7 +199,7 @@ GLOBAL UTIL
       };
       scope.addSprite = function() {
         scope.sprites.push({
-          name: 'new sprite',
+          name: 'sprite',
           actions: []
         });
         return timeout(function() {
@@ -190,7 +211,7 @@ GLOBAL UTIL
       };
       scope.addAction = function(spriteIndex) {
         scope.sprites[spriteIndex].actions.push({
-          name: 'new action',
+          name: 'action',
           frames: []
         });
         return timeout(function() {
@@ -201,7 +222,8 @@ GLOBAL UTIL
         return scope.sprites[spriteIndex].actions.splice(actionIndex, 1);
       };
       scope.addFrame = function(spriteIndex, actionIndex) {
-        return scope.sprites[spriteIndex].actions[actionIndex].frames.push([0, 0, 1, 10]);
+        scope.sprites[spriteIndex].actions[actionIndex].frames.push([]);
+        return scope.setSelected(spriteIndex, actionIndex, scope.sprites[spriteIndex].actions[actionIndex].frames.length - 1);
       };
       scope.removeFrame = function(spriteIndex, actionIndex, frameIndex) {
         return scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1);
@@ -232,7 +254,10 @@ GLOBAL UTIL
             navigatorCursor.height = selectorCq.canvas.height * navigatorCursor.zoom;
             navigatorCursor.x = navigatorMouseCoords.x - navigatorCursor.width / 2;
             navigatorCursor.y = navigatorMouseCoords.y - navigatorCursor.height / 2;
-            this.save().translate((this.canvas.width - img.width * imgResizeFactor) / 2, (this.canvas.height - img.height * imgResizeFactor) / 2).drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor).restore().save().translate(navigatorCursor.x, navigatorCursor.y).save().globalAlpha(0.3).fillStyle(navigatorCursor.color).fillRect(0, 0, navigatorCursor.width, navigatorCursor.height).restore().strokeStyle(navigatorCursor.color).strokeRect(0, 0, navigatorCursor.width, navigatorCursor.height).restore();
+            this.save().translate((this.canvas.width - img.width * imgResizeFactor) / 2, (this.canvas.height - img.height * imgResizeFactor) / 2).drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor).restore();
+            if (mouseOverNavigator) {
+              this.save().translate(navigatorCursor.x, navigatorCursor.y).save().globalAlpha(0.3).fillStyle(navigatorCursor.color).fillRect(0, 0, navigatorCursor.width, navigatorCursor.height).restore().strokeStyle(navigatorCursor.color).strokeRect(0, 0, navigatorCursor.width, navigatorCursor.height).restore();
+            }
             if ((navigatorSelection.x != null) && (navigatorSelection.y != null)) {
               return this.save().translate(navigatorSelection.x, navigatorSelection.y).save().globalAlpha(0.3).fillStyle(navigatorSelection.color).fillRect(0, 0, selectorCanvas.width() * navigatorSelection.zoom, selectorCanvas.height() * navigatorSelection.zoom).restore().strokeStyle(navigatorSelection.color).strokeRect(0, 0, selectorCanvas.width() * navigatorSelection.zoom, selectorCanvas.height() * navigatorSelection.zoom).restore();
             }
@@ -241,8 +266,10 @@ GLOBAL UTIL
       });
 
       /*
-      ZOOMED VIEW FRAMEWORK
+      SELECTOR FRAMEWORK
        */
+      horizontalEdgeAdjustment = 0;
+      verticalEdgeAdjustment = 0;
       selectorCq = cq(selectorCanvas[0]).framework({
         onmousemove: function(x, y) {
           return selectorMouseCoords = {
@@ -250,45 +277,99 @@ GLOBAL UTIL
             y: y
           };
         },
+        onmousedown: function(x, y, btn) {
+          var s;
+          s = scope.getSelected();
+          console.log(horizontalEdgeAdjustment);
+          x = Math.floor((x - horizontalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.x / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom);
+          y = Math.floor((y - verticalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.y / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom);
+          if (btn === 0) {
+            scope.$apply(function() {
+              s[0] = x;
+              return s[1] = y;
+            });
+          }
+          if (btn === 1 || btn === 2) {
+            return scope.$apply(function() {
+              if ((s[0] != null) && (s[1] != null)) {
+                s[2] = x - s[0];
+                return s[3] = y - s[1];
+              }
+            });
+          }
+        },
         onrender: function(delta, time) {
           var action, actionIndex, frame, frameColor, frameHeight, frameIndex, frameWidth, frameX, frameY, selected, sprite, spriteIndex, _ref, _results;
           this.context.mozImageSmoothingEnabled = this.context.webkitImageSmoothingEnabled = this.context.msImageSmoothingEnabled = this.context.imageSmoothingEnabled = false;
           this.clear();
           drawBackgroundTiles(this, navigatorSelection.zoom);
+          horizontalEdgeAdjustment = (navigatorCanvas.width() - img.width * imgResizeFactor) / 2 / imgResizeFactor;
+          verticalEdgeAdjustment = (navigatorCanvas.height() - img.height * imgResizeFactor) / 2 / imgResizeFactor;
           if ((navigatorSelection.x != null) && (navigatorSelection.y != null)) {
-            this.drawImage(img, (navigatorSelection.x - (navigatorCanvas.width() - img.width * imgResizeFactor) / 2) / imgResizeFactor, (navigatorSelection.y - (navigatorCanvas.height() - img.height * imgResizeFactor) / 2) / imgResizeFactor, (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor, (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor, 0, 0, this.canvas.width, this.canvas.height);
+            this.drawImage(img, navigatorSelection.x - horizontalEdgeAdjustment, navigatorSelection.y - verticalEdgeAdjustment, (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor, (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor, 0, 0, this.canvas.width, this.canvas.height);
             _ref = scope.sprites;
             _results = [];
             for (spriteIndex in _ref) {
               sprite = _ref[spriteIndex];
-              _results.push((function() {
-                var _ref1, _results1;
-                _ref1 = sprite.actions;
-                _results1 = [];
-                for (actionIndex in _ref1) {
-                  action = _ref1[actionIndex];
-                  _results1.push((function() {
-                    var _ref2, _results2;
-                    _ref2 = action.frames;
-                    _results2 = [];
-                    for (frameIndex in _ref2) {
-                      frame = _ref2[frameIndex];
-                      spriteIndex = parseInt(spriteIndex);
-                      actionIndex = parseInt(actionIndex);
-                      frameIndex = parseInt(frameIndex);
-                      frameX = frame[0] / navigatorSelection.zoom;
-                      frameY = frame[1] / navigatorSelection.zoom;
-                      frameWidth = frame[2] / navigatorSelection.zoom;
-                      frameHeight = frame[3] / navigatorSelection.zoom;
-                      selected = scope.listSelection.sprite === spriteIndex && scope.listSelection.action === actionIndex && scope.listSelection.frame === frameIndex;
-                      frameColor = selected ? '#c80819' : '#21d4cc';
-                      _results2.push(this.save().translate(frameX, frameY).save().globalAlpha(0.3).fillStyle(frameColor).fillRect(0, 0, frameWidth, frameHeight).restore().strokeStyle(frameColor).strokeRect(0, 0, frameWidth, frameHeight).restore());
+              if (!sprite.hidden) {
+                _results.push((function() {
+                  var _ref1, _results1;
+                  _ref1 = sprite.actions;
+                  _results1 = [];
+                  for (actionIndex in _ref1) {
+                    action = _ref1[actionIndex];
+                    if (!action.hidden) {
+                      _results1.push((function() {
+                        var _ref2, _results2;
+                        _ref2 = action.frames;
+                        _results2 = [];
+                        for (frameIndex in _ref2) {
+                          frame = _ref2[frameIndex];
+                          if (!frame.hidden) {
+                            if ((frame[0] != null) && (frame[1] != null)) {
+                              if (dev_frame++ < 10) {
+                                console.log(frame[0]);
+                              }
+                              spriteIndex = parseInt(spriteIndex);
+                              actionIndex = parseInt(actionIndex);
+                              frameIndex = parseInt(frameIndex);
+                              frameX = (frame[0] - navigatorSelection.x + horizontalEdgeAdjustment) / navigatorSelection.zoom;
+                              frameY = (frame[1] - navigatorSelection.y + verticalEdgeAdjustment) / navigatorSelection.zoom;
+                              frameWidth = frame[2] / navigatorSelection.zoom;
+                              frameHeight = frame[3] / navigatorSelection.zoom;
+                              selected = scope.selectedFrame.sprite === spriteIndex && scope.selectedFrame.action === actionIndex && scope.selectedFrame.frame === frameIndex;
+                              frameColor = selected ? '#c80819' : '#21d4cc';
+                              this.save().translate(frameX, frameY).save().globalAlpha(0.3).fillStyle(frameColor).fillRect(0, 0, frameWidth, frameHeight).restore().strokeStyle(frameColor).strokeRect(0, 0, frameWidth, frameHeight).restore();
+                              if (selected) {
+                                this.fillStyle('#fea00e');
+                                this.fillRect(frameX - 2, frameY - 2, 4, 4);
+                                if ((frame[2] != null) && (frame[3] != null)) {
+                                  this.fillStyle('#24ffae');
+                                  _results2.push(this.fillRect(frameX + frameWidth - 2, frameY + frameHeight - 2, 4, 4));
+                                } else {
+                                  _results2.push(void 0);
+                                }
+                              } else {
+                                _results2.push(void 0);
+                              }
+                            } else {
+                              _results2.push(void 0);
+                            }
+                          } else {
+                            _results2.push(void 0);
+                          }
+                        }
+                        return _results2;
+                      }).call(this));
+                    } else {
+                      _results1.push(void 0);
                     }
-                    return _results2;
-                  }).call(this));
-                }
-                return _results1;
-              }).call(this));
+                  }
+                  return _results1;
+                }).call(this));
+              } else {
+                _results.push(void 0);
+              }
             }
             return _results;
           }

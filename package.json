@@ -23,11 +23,11 @@
         "javascript"
     ],
     "dependencies": {
-        "coffee-script": "1.6.x",
-        "colors": "0.6.x",
-        "stylus": "0.37.x",
-        "nib": "1.0.x",
-        "jade": "0.35.x",
+        "coffee-script": "1.7.x",
+        "colors": "x",
+        "stylus": "x",
+        "nib": "x",
+        "jade": "x",
         "connect": "2.14.x"
     },
     "license": "MIT",

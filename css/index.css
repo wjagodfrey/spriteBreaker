@@ -9,6 +9,7 @@ input_style,
 }
 body {
   margin: 0;
+  padding-top: 20px;
 }
 canvas {
   cursor: crosshair;
@@ -100,7 +101,7 @@ list_caret.open::before,
   margin-top: 6px;
 }
 #list input[type=text] {
-  width: 90px;
+  width: 110px;
   border: none;
   cursor: pointer;
   display: inline-block;

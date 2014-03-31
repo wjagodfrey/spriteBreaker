@@ -5,7 +5,7 @@ fs      = require 'fs'
 
 
 ###
-  build task task
+  build task
 ###
 
 task 'build', 'Watch all jade, stylus and coffeescript files and build appropriately', ->
@@ -13,7 +13,6 @@ task 'build', 'Watch all jade, stylus and coffeescript files and build appropria
   jsFiles = [
     "#{jsPref}util.coffee"
     "#{jsPref}init.coffee"
-    "#{jsPref}foundation.coffee"
     "#{jsPref}controller.coffee"
   ].join(' ')
 
