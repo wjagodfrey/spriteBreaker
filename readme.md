@@ -1,4 +1,4 @@
-# spriteBreaker
+# SpriteBreaker
 
 ## Installation
 * `clone`

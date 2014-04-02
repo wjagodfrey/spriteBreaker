@@ -6,6 +6,13 @@ app.controller 'appCtrl', [
     ###
     INIT
     ###
+
+    navigatorCanvas[0].width = navigatorCanvas.parent().width()
+    navigatorCanvas[0].height = 200
+    selectorCanvas[0].width = selectorCanvas.parent().width()
+    selectorCanvas[0].height = 250
+
+
     scope.selectedFrame =
       sprite : 0
       action : 0
@@ -18,26 +25,23 @@ app.controller 'appCtrl', [
       scope.sprites = []
       img.src = imgData
 
-      # #DEV
-      # scope.sprites = [
-      #   {
-      #     name: 'roboto'
-      #     actions: [
-      #       {
-      #         name: 'stand_up'
-      #         frames: [
-      #           []
-      #         ]
-      #       }
-      #       {
-      #         name: 'stand_down'
-      #         frames: [
-      #           []
-      #         ]
-      #       }
-      #     ]
-      #   }
-      # ]
+      #DEV
+      scope.sprites = [
+        {
+          "name": "roboto"
+          "actions": [
+            {
+              "name": "walk_up"
+              "frames": [
+                [1,30, 6,26]
+                [1,59, 6,26]
+                [1,88, 6,26]
+                [1,117, 6,26]
+              ]
+            }
+          ]
+        }
+      ]
 
     ###
     LISTENERS
@@ -52,6 +56,11 @@ app.controller 'appCtrl', [
     $(window).on 'blur', ->
       mouseOverNavigator = false
 
+    # elements with the click-select class will be selected on focus
+    $('body').on 'focus', '.click-select', (e) ->
+      timeout ->
+        $(e.target).select()
+
     # remove context menu from canvases
     $('canvas').on 'contextmenu', (e) ->
       e.preventDefault()
@@ -62,13 +71,31 @@ app.controller 'appCtrl', [
     # listen for mouse out
     navigatorCanvas.on 'mouseout', (e) ->
       mouseOverNavigator = false
-    # listen for scroll events
+
+    # zoom navigator selection cursor on navigator canvas scroll
     navigatorCanvas.on 'mousewheel', (e) ->
       e.preventDefault()
       if e.deltaY
         navigatorCursor.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
         if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
         if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
+
+    # zoom navigator selection selection canvas on scroll
+    selectorCanvas.on 'mousewheel', (e) ->
+      e.preventDefault()
+      if e.deltaY and navigatorSelection.x? and navigatorSelection.y?
+        zoomCache = navigatorSelection.zoom
+        navigatorSelection.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
+
+        if navigatorSelection.zoom < 0.1 then navigatorSelection.zoom = 0.1
+        if navigatorSelection.zoom > 1 then navigatorSelection.zoom = 1
+
+        xPercentage = selectorMouseCoords.x / selectorCanvas.width()
+        yPercentage = selectorMouseCoords.y / selectorCanvas.height()
+
+        if zoomDifference = zoomCache - navigatorSelection.zoom
+          navigatorSelection.x      = (navigatorSelection.x + (selectorCq.canvas.width * zoomDifference) * xPercentage)
+          navigatorSelection.y      = (navigatorSelection.y + (selectorCq.canvas.height * zoomDifference) * yPercentage)
 
     # load new image on file select
     fileSelect.on 'change', (e) ->
@@ -84,7 +111,7 @@ app.controller 'appCtrl', [
     ###
     scope.getSelected = ->
       r = scope.selectedFrame
-      scope.sprites[r.sprite].actions[r.action].frames[r.frame]
+      scope.sprites[r.sprite]?.actions[r.action]?.frames[r.frame]
     scope.setSelected = (sprite, action, frame) ->
       scope.selectedFrame =
         sprite : sprite
@@ -209,21 +236,25 @@ app.controller 'appCtrl', [
       onmousedown: (x,y,btn)->
 
         s = scope.getSelected()
-        # remap x and y to match position on spritesheet file
-        console.log horizontalEdgeAdjustment
-        x = Math.floor((x - horizontalEdgeAdjustment/navigatorSelection.zoom + navigatorSelection.x/navigatorSelection.zoom + 0.5) * navigatorSelection.zoom)
-        y = Math.floor((y - verticalEdgeAdjustment/navigatorSelection.zoom + navigatorSelection.y/navigatorSelection.zoom + 0.5) * navigatorSelection.zoom)
-        # left mouse button, set top left frame pos
-        if btn is 0
-          scope.$apply ->
-            s[0] = x
-            s[1] = y
-        # right or middle mouse button, set bottom right frame pos
-        if btn in [1,2]
-          scope.$apply ->
-            if s[0]? and s[1]?
-              s[2] = x - s[0]
-              s[3] = y - s[1]
+        if s
+          # remap x and y to match position on spritesheet file
+          x = Math.floor((x - horizontalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.x / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom)
+          y = Math.floor((y - verticalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.y / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom)
+          # left mouse button, set top left frame pos
+          if btn is 0
+            scope.$apply ->
+              # adjust bottom right point
+              if s[0]? and s[1]? and s[2]? and s[3]?
+                s[2] = (s[0] + s[2]) - x
+                s[3] = (s[1] + s[3]) - y
+              s[0] = x
+              s[1] = y
+          # right or middle mouse button, set bottom right frame pos
+          if btn in [1,2]
+            scope.$apply ->
+              if s[0]? and s[1]?
+                s[2] = x - s[0]
+                s[3] = y - s[1]
 
       onrender: (delta, time) ->
 
@@ -265,9 +296,6 @@ app.controller 'appCtrl', [
                     if !frame.hidden
 
                       if frame[0]? and frame[1]?
-
-                        if dev_frame++ < 10
-                          console.log frame[0]
 
                         spriteIndex = parseInt spriteIndex
                         actionIndex = parseInt actionIndex

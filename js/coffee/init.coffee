@@ -16,11 +16,7 @@ selectorMouseCoords = {}
 img = new Image()
 
 navigatorCanvas = $('canvas#navigator')
-navigatorCanvas[0].width = navigatorCanvas.parent().width()
-navigatorCanvas[0].height = 200
 selectorCanvas = $('canvas#selector')
-selectorCanvas[0].width = selectorCanvas.parent().width()
-selectorCanvas[0].height = 250
 
 imagedata = $('#imagedata')
 fileSelect = $('#filepath')
@@ -51,10 +47,10 @@ reset = ->
     zoom  : 0.3
   navigatorSelection =
     color: '#29a4d3'
-    zoom : 0.3
+    zoom : 0.2
     #DEV
-    x: -10
-    y: 0
+    x: 40
+    y: 30
 
   navigatorMouseCoords =
     x: navigatorCanvas.innerWidth/2

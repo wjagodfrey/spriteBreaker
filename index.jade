@@ -9,7 +9,7 @@ html(ng-app="app" ng-controller="appCtrl")
   body
 
     //- wrapper
-    .container
+    .container.ng-cloak
       .row
         //- left col
         .col-xs-7
@@ -27,26 +27,29 @@ html(ng-app="app" ng-controller="appCtrl")
               form#form
                 .input-group
                   .input-group-addon
-                    span.glyphicon.glyphicon-floppy-open
+                    span.glyphicon.glyphicon-folder-open
                   input(type="file", accept="image/*").form-control#filepath
 
                 .input-group
                   .input-group-addon
                     span.glyphicon.glyphicon-picture
-                  input(type="text" ng-model="imagedata").form-control#imagedata
-                  span.input-group-btn#imagedata-copy
-                    button(type="button" ng-click="copy(imagedata)").btn.btn-default.btn-group copy
+                  input(type="text" ng-model="imagedata").form-control.click-select#imagedata
 
                 //- label output
                 .input-group
                   .input-group-addon
-                    span.glyphicon.glyphicon-floppy-save
-                  textarea(type="text" ng-model="output").form-control#output
-                  span.input-group-btn#output-copy
-                    button(type="button" ng-click="copy(output)").btn.btn-default.btn-group copy
+                    span.glyphicon.glyphicon-circle-arrow-down
+                  textarea(type="text" ng-model="output").form-control.click-select#output
+                  span.input-group-btn#output-btn
+                    button(type="button" ng-click="outputSettings()").btn.btn-default.btn-group
+                      span.glyphicon.glyphicon-cog
                 .input-group
-                  button(type="button").btn.form.btn-primary Save
-                  button(type="button").btn.btn-primary Load
+                  .btn-group(style='margin-left:13px')
+                    button(type="button").btn.form.btn-primary Save
+                    button(type="button").btn.btn-primary Load
+                  .btn-group(style='margin-left:13px')
+                    button(type="button").btn.form.btn-info
+                      span.glyphicon.glyphicon-question-sign
 
         //- right col
         .col-xs-5
@@ -60,8 +63,7 @@ html(ng-app="app" ng-controller="appCtrl")
                 ng-click="open = !open"
                 ng-class="{open:open}"
               )
-                | {{spriteIndex}}
-                input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control
+                input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control.click-select
                 .button_wrapper
                   button(type="button" ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
                   button(type="button" ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
@@ -76,7 +78,7 @@ html(ng-app="app" ng-controller="appCtrl")
                   ng-click="open = !open"
                   ng-class="{open:open}"
                 )
-                  input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control
+                  input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control.click-select
                   .button_wrapper
                     button(type="button" ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
                     button(type="button" ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
@@ -92,8 +94,10 @@ html(ng-app="app" ng-controller="appCtrl")
                     img(ng-src="{{getFrameImage(frameData, 50, 50)}}")
                     .button_wrapper
                       button(type="button" ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
-          .row#add_list
-            button(type="button" ng-click="addSprite()").btn.btn-info.btn-block + sprite
+
+            button(type="button" ng-click="addSprite()").btn.btn-info#add_list
+              .span.glyphicon.glyphicon-plus-sign
+              | &nbsp; sprite
 
 
 

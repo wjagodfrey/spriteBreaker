@@ -5,11 +5,11 @@ GLOBAL UTIL
 PNGCanvas = cq()
 @getPNG = (canvas, coords, width, height) ->
   if !coords then coords = []
-  selectionX = coords[0] ?= 0
-  selectionY = coords[1] ?= 0
+  selectionX = if coords[0]? then coords[0] else 0
+  selectionY = if coords[1]? then coords[1] else 0
   # have to make sure not to overwrite 0s
-  selectionWidth = coords[2] = if coords[2]? then coords[2] else canvas.width
-  selectionHeight = coords[3] = if coords[3]? then coords[3] else canvas.height
+  selectionWidth = if coords[2]? then coords[2] else 0
+  selectionHeight = if coords[3]? then coords[3] else 0
 
   width ?= selectionWidth
   height ?= selectionHeight

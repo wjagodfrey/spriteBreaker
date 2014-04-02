@@ -26,6 +26,8 @@ green_darkest  = darken(green, 75%)
 
 grey_light = #BDC8D0
 
+list_item_gap = 2px
+
 input_style
   color blue
 // end vars
@@ -75,7 +77,7 @@ output-height = 50px
 #output
   resize none
   height output-height
-#output-copy
+#output-btn
   padding 0
   margin 0
   button
@@ -106,7 +108,7 @@ list_caret
     content ''
 
 #list
-  height 410px
+  height 460px
   overflow-y scroll
   border 1px solid grey_light
   border-radius 4px
@@ -132,7 +134,7 @@ list_caret
       cursor text
 
   .sprite
-    margin-top 10px
+    margin-top list_item_gap
   .sprite:first-of-type
     margin-top 0
 
@@ -173,5 +175,14 @@ list_caret
       border-left-color green_lighter
       background green_lightest
 
-#add_list
-  height 50px
+#add_list.btn.btn-info
+  height 40px
+  width 100%
+  margin 0
+  margin-top list_item_gap
+  border-radius 0!important
+  border none
+
+// ngCloak
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak
+  display none !important

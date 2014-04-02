@@ -40,11 +40,11 @@ input[type=file] {
   resize: none;
   height: 50px;
 }
-#output-copy {
+#output-btn {
   padding: 0;
   margin: 0;
 }
-#output-copy button {
+#output-btn button {
   padding-top: 0;
   padding-bottom: 0;
   height: 50px;
@@ -83,7 +83,7 @@ list_caret.open::before,
   content: '';
 }
 #list {
-  height: 410px;
+  height: 460px;
   overflow-y: scroll;
   border: 1px solid #bdc8d0;
   border-radius: 4px;
@@ -112,7 +112,7 @@ list_caret.open::before,
   cursor: text;
 }
 #list .sprite {
-  margin-top: 10px;
+  margin-top: 2px;
 }
 #list .sprite:first-of-type {
   margin-top: 0;
@@ -155,6 +155,19 @@ list_caret.open::before,
   border-left-color: #ccf384;
   background: #e5f9c2;
 }
-#add_list {
-  height: 50px;
+#add_list.btn.btn-info {
+  height: 40px;
+  width: 100%;
+  margin: 0;
+  margin-top: 2px;
+  border-radius: 0 !important;
+  border: none;
+}
+[ngcloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak {
+  display: none !important;
 }

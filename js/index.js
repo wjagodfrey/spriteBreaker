@@ -14,10 +14,10 @@ GLOBAL UTIL
     if (!coords) {
       coords = [];
     }
-    selectionX = coords[0] != null ? coords[0] : coords[0] = 0;
-    selectionY = coords[1] != null ? coords[1] : coords[1] = 0;
-    selectionWidth = coords[2] = coords[2] != null ? coords[2] : canvas.width;
-    selectionHeight = coords[3] = coords[3] != null ? coords[3] : canvas.height;
+    selectionX = coords[0] != null ? coords[0] : 0;
+    selectionY = coords[1] != null ? coords[1] : 0;
+    selectionWidth = coords[2] != null ? coords[2] : 0;
+    selectionHeight = coords[3] != null ? coords[3] : 0;
     if (width == null) {
       width = selectionWidth;
     }
@@ -56,15 +56,7 @@ GLOBAL UTIL
 
   navigatorCanvas = $('canvas#navigator');
 
-  navigatorCanvas[0].width = navigatorCanvas.parent().width();
-
-  navigatorCanvas[0].height = 200;
-
   selectorCanvas = $('canvas#selector');
-
-  selectorCanvas[0].width = selectorCanvas.parent().width();
-
-  selectorCanvas[0].height = 250;
 
   imagedata = $('#imagedata');
 
@@ -98,9 +90,9 @@ GLOBAL UTIL
     };
     navigatorSelection = {
       color: '#29a4d3',
-      zoom: 0.3,
-      x: -10,
-      y: 0
+      zoom: 0.2,
+      x: 40,
+      y: 30
     };
     navigatorMouseCoords = {
       x: navigatorCanvas.innerWidth / 2,
@@ -119,6 +111,10 @@ GLOBAL UTIL
       INIT
        */
       var horizontalEdgeAdjustment, navigatorCq, selectorCq, verticalEdgeAdjustment;
+      navigatorCanvas[0].width = navigatorCanvas.parent().width();
+      navigatorCanvas[0].height = 200;
+      selectorCanvas[0].width = selectorCanvas.parent().width();
+      selectorCanvas[0].height = 250;
       scope.selectedFrame = {
         sprite: 0,
         action: 0,
@@ -127,7 +123,18 @@ GLOBAL UTIL
       scope.$watch('imagedata', function(imgData) {
         reset();
         scope.sprites = [];
-        return img.src = imgData;
+        img.src = imgData;
+        return scope.sprites = [
+          {
+            "name": "roboto",
+            "actions": [
+              {
+                "name": "walk_up",
+                "frames": [[1, 30, 6, 26], [1, 59, 6, 26], [1, 88, 6, 26], [1, 117, 6, 26]]
+              }
+            ]
+          }
+        ];
       });
 
       /*
@@ -138,6 +145,11 @@ GLOBAL UTIL
       }, true);
       $(window).on('blur', function() {
         return mouseOverNavigator = false;
+      });
+      $('body').on('focus', '.click-select', function(e) {
+        return timeout(function() {
+          return $(e.target).select();
+        });
       });
       $('canvas').on('contextmenu', function(e) {
         return e.preventDefault();
@@ -160,6 +172,26 @@ GLOBAL UTIL
           }
         }
       });
+      selectorCanvas.on('mousewheel', function(e) {
+        var xPercentage, yPercentage, zoomCache, zoomDifference;
+        e.preventDefault();
+        if (e.deltaY && (navigatorSelection.x != null) && (navigatorSelection.y != null)) {
+          zoomCache = navigatorSelection.zoom;
+          navigatorSelection.zoom += zoomSpeed * (e.deltaY < 1 ? 1 : -1);
+          if (navigatorSelection.zoom < 0.1) {
+            navigatorSelection.zoom = 0.1;
+          }
+          if (navigatorSelection.zoom > 1) {
+            navigatorSelection.zoom = 1;
+          }
+          xPercentage = selectorMouseCoords.x / selectorCanvas.width();
+          yPercentage = selectorMouseCoords.y / selectorCanvas.height();
+          if (zoomDifference = zoomCache - navigatorSelection.zoom) {
+            navigatorSelection.x = navigatorSelection.x + (selectorCq.canvas.width * zoomDifference) * xPercentage;
+            return navigatorSelection.y = navigatorSelection.y + (selectorCq.canvas.height * zoomDifference) * yPercentage;
+          }
+        }
+      });
       fileSelect.on('change', function(e) {
         var reader, selectedFile;
         selectedFile = e.target.files[0];
@@ -176,9 +208,9 @@ GLOBAL UTIL
       UTIL
        */
       scope.getSelected = function() {
-        var r;
+        var r, _ref, _ref1;
         r = scope.selectedFrame;
-        return scope.sprites[r.sprite].actions[r.action].frames[r.frame];
+        return (_ref = scope.sprites[r.sprite]) != null ? (_ref1 = _ref.actions[r.action]) != null ? _ref1.frames[r.frame] : void 0 : void 0;
       };
       scope.setSelected = function(sprite, action, frame) {
         return scope.selectedFrame = {
@@ -280,22 +312,27 @@ GLOBAL UTIL
         onmousedown: function(x, y, btn) {
           var s;
           s = scope.getSelected();
-          console.log(horizontalEdgeAdjustment);
-          x = Math.floor((x - horizontalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.x / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom);
-          y = Math.floor((y - verticalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.y / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom);
-          if (btn === 0) {
-            scope.$apply(function() {
-              s[0] = x;
-              return s[1] = y;
-            });
-          }
-          if (btn === 1 || btn === 2) {
-            return scope.$apply(function() {
-              if ((s[0] != null) && (s[1] != null)) {
-                s[2] = x - s[0];
-                return s[3] = y - s[1];
-              }
-            });
+          if (s) {
+            x = Math.floor((x - horizontalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.x / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom);
+            y = Math.floor((y - verticalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.y / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom);
+            if (btn === 0) {
+              scope.$apply(function() {
+                if ((s[0] != null) && (s[1] != null) && (s[2] != null) && (s[3] != null)) {
+                  s[2] = (s[0] + s[2]) - x;
+                  s[3] = (s[1] + s[3]) - y;
+                }
+                s[0] = x;
+                return s[1] = y;
+              });
+            }
+            if (btn === 1 || btn === 2) {
+              return scope.$apply(function() {
+                if ((s[0] != null) && (s[1] != null)) {
+                  s[2] = x - s[0];
+                  return s[3] = y - s[1];
+                }
+              });
+            }
           }
         },
         onrender: function(delta, time) {
@@ -327,9 +364,6 @@ GLOBAL UTIL
                           frame = _ref2[frameIndex];
                           if (!frame.hidden) {
                             if ((frame[0] != null) && (frame[1] != null)) {
-                              if (dev_frame++ < 10) {
-                                console.log(frame[0]);
-                              }
                               spriteIndex = parseInt(spriteIndex);
                               actionIndex = parseInt(actionIndex);
                               frameIndex = parseInt(frameIndex);
