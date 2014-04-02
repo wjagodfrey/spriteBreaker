@@ -1,7 +1,8 @@
 app.controller 'appCtrl', [
   '$scope'
   '$timeout'
-  (scope, timeout) ->
+  '$interval'
+  (scope, $timeout, $interval) ->
 
     ###
     INIT
@@ -28,11 +29,12 @@ app.controller 'appCtrl', [
       #DEV
       scope.sprites = [
         {
-          "name": "roboto"
-          "actions": [
+          name    : 'roboto'
+          actions : [
             {
-              "name": "walk_up"
-              "frames": [
+              name         : 'walk_up'
+              $sb_currentFrame : 0
+              frames       : [
                 [1,30, 6,26]
                 [1,59, 6,26]
                 [1,88, 6,26]
@@ -58,7 +60,7 @@ app.controller 'appCtrl', [
 
     # elements with the click-select class will be selected on focus
     $('body').on 'focus', '.click-select', (e) ->
-      timeout ->
+      $timeout ->
         $(e.target).select()
 
     # remove context menu from canvases
@@ -85,14 +87,13 @@ app.controller 'appCtrl', [
       e.preventDefault()
       if e.deltaY and navigatorSelection.x? and navigatorSelection.y?
         zoomCache = navigatorSelection.zoom
-        navigatorSelection.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
-
+        navigatorCursor.zoom = navigatorSelection.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
         if navigatorSelection.zoom < 0.1 then navigatorSelection.zoom = 0.1
         if navigatorSelection.zoom > 1 then navigatorSelection.zoom = 1
-
+        if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
+        if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
         xPercentage = selectorMouseCoords.x / selectorCanvas.width()
         yPercentage = selectorMouseCoords.y / selectorCanvas.height()
-
         if zoomDifference = zoomCache - navigatorSelection.zoom
           navigatorSelection.x      = (navigatorSelection.x + (selectorCq.canvas.width * zoomDifference) * xPercentage)
           navigatorSelection.y      = (navigatorSelection.y + (selectorCq.canvas.height * zoomDifference) * yPercentage)
@@ -127,22 +128,32 @@ app.controller 'appCtrl', [
 
     scope.addSprite = ->
       scope.sprites.push
-        name: 'sprite'
-        actions: []
+        name    : 'sprite'
+        actions : []
       # select new input
-      timeout ->
+      $timeout ->
         $('.sprite_header input')
         .eq(scope.sprites.length - 1)
         .select()
     scope.removeSprite = (spriteIndex) ->
       scope.sprites.splice(spriteIndex, 1)
 
+    # change action animation frame
+    $interval( =>
+      for sprite in scope.sprites
+        for action in sprite.actions
+          action.$sb_currentFrame++
+          if action.$sb_currentFrame >= action.frames.length
+            action.$sb_currentFrame = 0
+    , 200)
+
     scope.addAction = (spriteIndex) ->
-      scope.sprites[spriteIndex].actions.push
-        name: 'action'
-        frames: []
+      scope.sprites[spriteIndex].actions.push self =
+        name         : 'action'
+        frames       : []
+        $sb_currentFrame : 0
       # select new input
-      timeout ->
+      $timeout ->
         $('.sprite')
         .eq(spriteIndex)
         .find('.action_header input')
@@ -150,6 +161,7 @@ app.controller 'appCtrl', [
         .select()
     scope.removeAction = (spriteIndex, actionIndex) ->
       scope.sprites[spriteIndex].actions.splice(actionIndex, 1)
+
     scope.addFrame = (spriteIndex,actionIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.push []
       scope.setSelected spriteIndex, actionIndex, scope.sprites[spriteIndex].actions[actionIndex].frames.length-1

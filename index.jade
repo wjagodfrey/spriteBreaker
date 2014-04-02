@@ -79,6 +79,7 @@ html(ng-app="app" ng-controller="appCtrl")
                   ng-class="{open:open}"
                 )
                   input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control.click-select
+                  img(ng-src="{{getFrameImage(action.frames[action.$sb_currentFrame], 50, 50)}}")
                   .button_wrapper
                     button(type="button" ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
                     button(type="button" ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame

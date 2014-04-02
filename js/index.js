@@ -105,7 +105,7 @@ GLOBAL UTIL
   };
 
   app.controller('appCtrl', [
-    '$scope', '$timeout', function(scope, timeout) {
+    '$scope', '$timeout', '$interval', function(scope, $timeout, $interval) {
 
       /*
       INIT
@@ -126,11 +126,12 @@ GLOBAL UTIL
         img.src = imgData;
         return scope.sprites = [
           {
-            "name": "roboto",
-            "actions": [
+            name: 'roboto',
+            actions: [
               {
-                "name": "walk_up",
-                "frames": [[1, 30, 6, 26], [1, 59, 6, 26], [1, 88, 6, 26], [1, 117, 6, 26]]
+                name: 'walk_up',
+                $sb_currentFrame: 0,
+                frames: [[1, 30, 6, 26], [1, 59, 6, 26], [1, 88, 6, 26], [1, 117, 6, 26]]
               }
             ]
           }
@@ -147,7 +148,7 @@ GLOBAL UTIL
         return mouseOverNavigator = false;
       });
       $('body').on('focus', '.click-select', function(e) {
-        return timeout(function() {
+        return $timeout(function() {
           return $(e.target).select();
         });
       });
@@ -177,12 +178,18 @@ GLOBAL UTIL
         e.preventDefault();
         if (e.deltaY && (navigatorSelection.x != null) && (navigatorSelection.y != null)) {
           zoomCache = navigatorSelection.zoom;
-          navigatorSelection.zoom += zoomSpeed * (e.deltaY < 1 ? 1 : -1);
+          navigatorCursor.zoom = navigatorSelection.zoom += zoomSpeed * (e.deltaY < 1 ? 1 : -1);
           if (navigatorSelection.zoom < 0.1) {
             navigatorSelection.zoom = 0.1;
           }
           if (navigatorSelection.zoom > 1) {
             navigatorSelection.zoom = 1;
+          }
+          if (navigatorCursor.zoom < 0.1) {
+            navigatorCursor.zoom = 0.1;
+          }
+          if (navigatorCursor.zoom > 1) {
+            navigatorCursor.zoom = 1;
           }
           xPercentage = selectorMouseCoords.x / selectorCanvas.width();
           yPercentage = selectorMouseCoords.y / selectorCanvas.height();
@@ -234,19 +241,47 @@ GLOBAL UTIL
           name: 'sprite',
           actions: []
         });
-        return timeout(function() {
+        return $timeout(function() {
           return $('.sprite_header input').eq(scope.sprites.length - 1).select();
         });
       };
       scope.removeSprite = function(spriteIndex) {
         return scope.sprites.splice(spriteIndex, 1);
       };
+      $interval((function(_this) {
+        return function() {
+          var action, sprite, _i, _len, _ref, _results;
+          _ref = scope.sprites;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            sprite = _ref[_i];
+            _results.push((function() {
+              var _j, _len1, _ref1, _results1;
+              _ref1 = sprite.actions;
+              _results1 = [];
+              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                action = _ref1[_j];
+                action.$sb_currentFrame++;
+                if (action.$sb_currentFrame >= action.frames.length) {
+                  _results1.push(action.$sb_currentFrame = 0);
+                } else {
+                  _results1.push(void 0);
+                }
+              }
+              return _results1;
+            })());
+          }
+          return _results;
+        };
+      })(this), 200);
       scope.addAction = function(spriteIndex) {
-        scope.sprites[spriteIndex].actions.push({
+        var self;
+        scope.sprites[spriteIndex].actions.push(self = {
           name: 'action',
-          frames: []
+          frames: [],
+          $sb_currentFrame: 0
         });
-        return timeout(function() {
+        return $timeout(function() {
           return $('.sprite').eq(spriteIndex).find('.action_header input').eq(scope.sprites[spriteIndex].actions.length - 1).select();
         });
       };

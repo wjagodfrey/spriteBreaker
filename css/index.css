@@ -143,17 +143,20 @@ list_caret.open::before,
 #list .action_header.open {
   background: #feb457;
 }
+#list .action_header img {
+  margin: 5px 10px;
+}
 #list .frame_header {
   padding-left: 30px;
   background: #fecd8f;
   border-left: 20px solid #fecd8f;
 }
-#list .frame_header img {
-  background: #fff;
-}
 #list .frame_header.selected {
   border-left-color: #ccf384;
   background: #e5f9c2;
+}
+#list .frame_header.selected img {
+  margin-left: 20px;
 }
 #add_list.btn.btn-info {
   height: 40px;
