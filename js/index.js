@@ -90,9 +90,9 @@ GLOBAL UTIL
     };
     navigatorSelection = {
       color: '#29a4d3',
-      zoom: 0.2,
-      x: 40,
-      y: 30
+      zoom: 0.3,
+      x: 0,
+      y: 20
     };
     navigatorMouseCoords = {
       x: navigatorCanvas.innerWidth / 2,
@@ -115,6 +115,11 @@ GLOBAL UTIL
       navigatorCanvas[0].height = 200;
       selectorCanvas[0].width = selectorCanvas.parent().width();
       selectorCanvas[0].height = 250;
+      scope.options = {
+        output: {
+          useImageData: true
+        }
+      };
       scope.selectedFrame = {
         sprite: 0,
         action: 0,
@@ -295,6 +300,20 @@ GLOBAL UTIL
       scope.removeFrame = function(spriteIndex, actionIndex, frameIndex) {
         return scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1);
       };
+
+      /*
+      CONTROLLERS
+       */
+      scope.outputOptionsCtrl = [
+        '$scope', function(scope) {
+          scope.optionsCache = $.extend(true, {}, scope.$parent.$parent.options);
+          console.log(scope.$parent.$parent.options);
+          return scope.save = function() {
+            $.extend(scope.$parent.$parent.options, scope.optionsCache);
+            return scope.$parent.$parent.optionsOpen = false;
+          };
+        }
+      ];
 
       /*
       IMAGE NAVIGATOR FRAMEWORK

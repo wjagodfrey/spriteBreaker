@@ -6,7 +6,7 @@ html(ng-app="app" ng-controller="appCtrl")
     title SpriteBreaker - Wilfred James Godfrey
     link(rel="stylesheet" type="text/css" href="./css/index.css")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
-  body
+  body(ng-class="{'modal-open':optionsOpen}")
 
     //- wrapper
     .container.ng-cloak
@@ -40,16 +40,16 @@ html(ng-app="app" ng-controller="appCtrl")
                   .input-group-addon
                     span.glyphicon.glyphicon-circle-arrow-down
                   textarea(type="text" ng-model="output").form-control.click-select#output
-                  span.input-group-btn#output-btn
-                    button(type="button" ng-click="outputSettings()").btn.btn-default.btn-group
-                      span.glyphicon.glyphicon-cog
                 .input-group
-                  .btn-group(style='margin-left:13px')
-                    button(type="button").btn.form.btn-primary Save
-                    button(type="button").btn.btn-primary Load
-                  .btn-group(style='margin-left:13px')
-                    button(type="button").btn.form.btn-info
+                  .btn-group(style='margin-left:10px')
+                    button(type="button").btn.btn-sm.btn-primary Save
+                    button(type="button").btn.btn-sm.btn-primary Load
+                  .btn-group(style='margin-left:10px')
+                    button(type="button").btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-question-sign
+                    button(type="button" ng-click="optionsOpen = true").btn.btn-sm.btn-info
+                      span.glyphicon.glyphicon-cog
+
 
         //- right col
         .col-xs-5
@@ -99,6 +99,28 @@ html(ng-app="app" ng-controller="appCtrl")
             button(type="button" ng-click="addSprite()").btn.btn-info#add_list
               .span.glyphicon.glyphicon-plus-sign
               | &nbsp; sprite
+
+
+    .modal-backdrop(ng-if="optionsOpen")
+    //- output options modal
+    .modal(ng-if="optionsOpen" ng-controller="outputOptionsCtrl")
+        .modal-dialog
+            .modal-content
+              .modal-header
+                button.close(type='button' aria-hidden='true' ng-click="$parent.$parent.optionsOpen = false") ×
+                h3.modal-title Settings
+              .modal-body
+                .form
+                  h4 Output
+                  .col-xs-12
+                    .checkbox
+                      label
+                        input(type='checkbox' ng-model="optionsCache.output.useImageData")
+                        | Use image data instead of coordinates
+              .modal-footer
+                button.btn.btn-default(type='button' ng-click="$parent.$parent.optionsOpen = false") Close
+                button.btn.btn-primary(type='button' ng-click="save()") Save changes
+
 
 
 

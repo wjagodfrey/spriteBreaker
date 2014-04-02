@@ -13,6 +13,9 @@ app.controller 'appCtrl', [
     selectorCanvas[0].width = selectorCanvas.parent().width()
     selectorCanvas[0].height = 250
 
+    scope.options =
+      output:
+        useImageData : true
 
     scope.selectedFrame =
       sprite : 0
@@ -168,6 +171,18 @@ app.controller 'appCtrl', [
     scope.removeFrame = (spriteIndex, actionIndex, frameIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1)
 
+    ###
+    CONTROLLERS
+    ###
+    scope.outputOptionsCtrl = [
+      '$scope'
+      (scope) ->
+        scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
+        console.log scope.$parent.$parent.options
+        scope.save = ->
+          $.extend scope.$parent.$parent.options, scope.optionsCache
+          scope.$parent.$parent.optionsOpen = false
+    ]
 
     ###
     IMAGE NAVIGATOR FRAMEWORK
@@ -250,8 +265,22 @@ app.controller 'appCtrl', [
         s = scope.getSelected()
         if s
           # remap x and y to match position on spritesheet file
-          x = Math.floor((x - horizontalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.x / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom)
-          y = Math.floor((y - verticalEdgeAdjustment / navigatorSelection.zoom + navigatorSelection.y / navigatorSelection.zoom + 0.5) * navigatorSelection.zoom)
+          x = Math.floor(
+            (
+              x -
+              horizontalEdgeAdjustment / navigatorSelection.zoom +
+              navigatorSelection.x / navigatorSelection.zoom +
+              0.5
+            ) * navigatorSelection.zoom
+          )
+          y = Math.floor(
+            (
+              y -
+              verticalEdgeAdjustment / navigatorSelection.zoom +
+              navigatorSelection.y / navigatorSelection.zoom +
+              0.5
+            ) * navigatorSelection.zoom
+          )
           # left mouse button, set top left frame pos
           if btn is 0
             scope.$apply ->
@@ -318,7 +347,9 @@ app.controller 'appCtrl', [
                         frameWidth  = frame[2] / navigatorSelection.zoom
                         frameHeight = frame[3] / navigatorSelection.zoom
 
-                        selected  = scope.selectedFrame.sprite is spriteIndex and scope.selectedFrame.action is actionIndex and scope.selectedFrame.frame is frameIndex
+                        selected  = scope.selectedFrame.sprite is spriteIndex and
+                        scope.selectedFrame.action is actionIndex and
+                        scope.selectedFrame.frame is frameIndex
                         frameColor = if selected then '#c80819' else '#21d4cc'
 
                         @save()

@@ -112,7 +112,7 @@ list_caret.open::before,
   cursor: text;
 }
 #list .sprite {
-  margin-top: 2px;
+  margin-top: 0px;
 }
 #list .sprite:first-of-type {
   margin-top: 0;
@@ -147,12 +147,10 @@ list_caret.open::before,
   margin: 5px 10px;
 }
 #list .frame_header {
-  padding-left: 30px;
+  padding-left: 40px;
   background: #fecd8f;
-  border-left: 20px solid #fecd8f;
 }
 #list .frame_header.selected {
-  border-left-color: #ccf384;
   background: #e5f9c2;
 }
 #list .frame_header.selected img {
@@ -162,9 +160,24 @@ list_caret.open::before,
   height: 40px;
   width: 100%;
   margin: 0;
-  margin-top: 2px;
+  margin-top: 0px;
   border-radius: 0 !important;
   border: none;
+}
+.modal {
+  display: block !important;
+}
+.modal textarea {
+  resize: none;
+  height: 200px !important;
+}
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5) !important;
 }
 [ngcloak],
 [ng-cloak],
