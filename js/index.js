@@ -9,7 +9,7 @@ GLOBAL UTIL
 
   PNGCanvas = cq();
 
-  this.getPNG = function(canvas, coords, width, height) {
+  this.getPixelData = function(type, canvas, coords, width, height) {
     var imgResizeFactor, selectionHeight, selectionWidth, selectionX, selectionY;
     if (!coords) {
       coords = [];
@@ -29,7 +29,11 @@ GLOBAL UTIL
     PNGCanvas.context.mozImageSmoothingEnabled = PNGCanvas.context.webkitImageSmoothingEnabled = PNGCanvas.context.msImageSmoothingEnabled = PNGCanvas.context.imageSmoothingEnabled = false;
     imgResizeFactor = Math.min(PNGCanvas.canvas.height / selectionHeight, PNGCanvas.canvas.width / selectionWidth);
     PNGCanvas.clear().save().translate((PNGCanvas.canvas.width - selectionWidth * imgResizeFactor) / 2, (PNGCanvas.canvas.height - selectionHeight * imgResizeFactor) / 2).drawImage(canvas, selectionX, selectionY, selectionWidth, selectionHeight, 0, 0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor).restore();
-    return PNGCanvas.canvas.toDataURL();
+    if (type === 'png') {
+      return PNGCanvas.canvas.toDataURL();
+    } else {
+      return PNGCanvas.context.getImageData(0, 0, width, height);
+    }
   };
 
   app = angular.module('app', []);
@@ -117,7 +121,8 @@ GLOBAL UTIL
       selectorCanvas[0].height = 250;
       scope.options = {
         output: {
-          useImageData: true
+          frame: 'array',
+          naming: 'object'
         }
       };
       scope.selectedFrame = {
@@ -146,8 +151,47 @@ GLOBAL UTIL
       /*
       LISTENERS
        */
-      scope.$watch('sprites', function(sprites) {
-        return scope.output = JSON.stringify(sprites);
+      scope.$watch('[sprites, options]', function(_arg) {
+        var action, frame, i, opt, options, output, sprite, sprites, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+        sprites = _arg[0], options = _arg[1];
+        opt = options.output;
+        output = (opt.naming === 'object' ? '{' : '[');
+
+        /*
+        sprite loop
+         */
+        _ref = scope.sprites;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          sprite = _ref[_i];
+          output += (opt.naming === 'object' ? "'" + sprite.name + "':{'actions':{" : "{'name':'" + sprite.name + "','actions':[");
+
+          /*
+          action loop
+           */
+          _ref1 = sprite.actions;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            action = _ref1[_j];
+            output += (opt.naming === 'object' ? "'" + action.name + "':{'frames':[" : "{'name':'" + action.name + "','frames':[");
+
+            /*
+            frame loop
+             */
+            _ref2 = action.frames;
+            for (i in _ref2) {
+              frame = _ref2[i];
+              i = parseInt(i);
+              output += (opt.frame === 'array' ? "" + (JSON.stringify(frame)) : opt.frame === 'object' ? "{'x':" + frame[0] + ",'y':" + frame[1] + ",'width':" + frame[2] + ",'height':" + frame[3] + "}" : opt.frame === 'png' ? "'" + (getPixelData('png', img, frame)) + "'" : opt.frame === 'image' ? "" + (JSON.stringify(getPixelData('img', img, frame))) : void 0);
+              console.log(i, action.frames.length - 1);
+              if (i !== action.frames.length - 1) {
+                output += ',';
+              }
+            }
+            output += (opt.naming === 'object' ? "]}" : "]}");
+          }
+          output += (opt.naming === 'object' ? "}}" : "]}");
+        }
+        output += (opt.naming === 'object' ? "}" : "]");
+        return scope.output = output.replace(/\'/g, '"');
       }, true);
       $(window).on('blur', function() {
         return mouseOverNavigator = false;
@@ -238,7 +282,7 @@ GLOBAL UTIL
       };
       scope.getFrameImage = function(dimensions, width, height) {
         var result;
-        result = getPNG(img, dimensions, width, height);
+        result = getPixelData('png', img, dimensions, width, height);
         return result;
       };
       scope.addSprite = function() {
@@ -305,6 +349,16 @@ GLOBAL UTIL
       CONTROLLERS
        */
       scope.outputOptionsCtrl = [
+        '$scope', function(scope) {
+          scope.optionsCache = $.extend(true, {}, scope.$parent.$parent.options);
+          console.log(scope.$parent.$parent.options);
+          return scope.save = function() {
+            $.extend(scope.$parent.$parent.options, scope.optionsCache);
+            return scope.$parent.$parent.optionsOpen = false;
+          };
+        }
+      ];
+      scope.infoModalCtrl = [
         '$scope', function(scope) {
           scope.optionsCache = $.extend(true, {}, scope.$parent.$parent.options);
           console.log(scope.$parent.$parent.options);

@@ -38,16 +38,7 @@ input[type=file] {
 }
 #output {
   resize: none;
-  height: 50px;
-}
-#output-btn {
-  padding: 0;
-  margin: 0;
-}
-#output-btn button {
-  padding-top: 0;
-  padding-bottom: 0;
-  height: 50px;
+  height: 200px;
 }
 list_item,
 #list .sprite_header,
@@ -170,6 +161,10 @@ list_caret.open::before,
 .modal textarea {
   resize: none;
   height: 200px !important;
+}
+.modal .fixed-width {
+  width: 80px;
+  display: inline-block;
 }
 .modal-backdrop {
   position: absolute;

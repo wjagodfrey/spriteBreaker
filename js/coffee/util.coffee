@@ -3,7 +3,7 @@ GLOBAL UTIL
 ###
 
 PNGCanvas = cq()
-@getPNG = (canvas, coords, width, height) ->
+@getPixelData = (type, canvas, coords, width, height) ->
   if !coords then coords = []
   selectionX = if coords[0]? then coords[0] else 0
   selectionY = if coords[1]? then coords[1] else 0
@@ -37,4 +37,7 @@ PNGCanvas = cq()
 
 
   # .drawImage(canvas, coords[0],coords[1],coords[2],coords[3], 0,0,width,height)
-  PNGCanvas.canvas.toDataURL()
+  if type is 'png'
+    PNGCanvas.canvas.toDataURL()
+  else
+    PNGCanvas.context.getImageData 0,0,width,height

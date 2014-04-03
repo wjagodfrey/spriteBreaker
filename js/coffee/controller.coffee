@@ -15,7 +15,8 @@ app.controller 'appCtrl', [
 
     scope.options =
       output:
-        useImageData : true
+        frame: 'array'
+        naming: 'object'
 
     scope.selectedFrame =
       sprite : 0
@@ -30,6 +31,7 @@ app.controller 'appCtrl', [
       img.src = imgData
 
       #DEV
+      # scope.optionsOpen = true
       scope.sprites = [
         {
           name    : 'roboto'
@@ -53,8 +55,81 @@ app.controller 'appCtrl', [
     ###
 
     # keep output string updated
-    scope.$watch 'sprites', (sprites) ->
-      scope.output = JSON.stringify(sprites)
+    scope.$watch '[sprites, options]', ([sprites, options]) ->
+      opt = options.output
+
+      #begin output
+      output = (
+        if opt.naming is 'object'
+          '{'
+        else # array
+          '['
+      )
+
+      ###
+      sprite loop
+      ###
+      for sprite in scope.sprites
+        # begin sprite
+        output += (
+          if opt.naming is 'object'
+            "'#{sprite.name}':{'actions':{"
+          else # array
+            "{'name':'#{sprite.name}','actions':["
+        )
+        ###
+        action loop
+        ###
+        for action in sprite.actions
+          # begin action
+          output += (
+            if opt.naming is 'object'
+              "'#{action.name}':{'frames':["
+            else # array
+              "{'name':'#{action.name}','frames':["
+          )
+          ###
+          frame loop
+          ###
+          for i, frame of action.frames
+            i = parseInt i
+            # begin action
+            output += (
+              if opt.frame is 'array'
+                "#{JSON.stringify frame}"
+              else if opt.frame is 'object'
+                "{'x':#{frame[0]},'y':#{frame[1]},'width':#{frame[2]},'height':#{frame[3]}}"
+              else if opt.frame is 'png'
+                "'#{getPixelData 'png', img, frame}'"
+              else if opt.frame is 'image'
+                "#{JSON.stringify getPixelData('img', img, frame)}"
+            )
+            console.log i, action.frames.length-1
+            if i isnt action.frames.length-1 then output += ','
+
+          # close action
+          output += (
+            if opt.naming is 'object'
+              "]}"
+            else # array
+              "]}"
+          )
+        # close sprite
+        output += (
+          if opt.naming is 'object'
+            "}}"
+          else # array
+            "]}"
+        )
+      # close output
+      output += (
+        if opt.naming is 'object'
+          "}"
+        else # array
+          "]"
+      )
+
+      scope.output = output.replace /\'/g, '"'
     , true
 
     # when you leave the window or tab
@@ -126,7 +201,7 @@ app.controller 'appCtrl', [
       s.frame is frame and s.action is action and s.frame is frame
 
     scope.getFrameImage = (dimensions, width, height) ->
-      result = getPNG img, dimensions, width, height
+      result = getPixelData 'png', img, dimensions, width, height
       result
 
     scope.addSprite = ->
@@ -175,6 +250,15 @@ app.controller 'appCtrl', [
     CONTROLLERS
     ###
     scope.outputOptionsCtrl = [
+      '$scope'
+      (scope) ->
+        scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
+        console.log scope.$parent.$parent.options
+        scope.save = ->
+          $.extend scope.$parent.$parent.options, scope.optionsCache
+          scope.$parent.$parent.optionsOpen = false
+    ]
+    scope.infoModalCtrl = [
       '$scope'
       (scope) ->
         scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options

@@ -73,17 +73,9 @@ input[type=file]
 #filepath
   @extend input_style
 
-output-height = 50px
 #output
   resize none
-  height output-height
-#output-btn
-  padding 0
-  margin 0
-  button
-    padding-top 0
-    padding-bottom 0
-    height output-height
+  height 200px
 
 list_item
   cursor pointer
@@ -190,6 +182,9 @@ list_caret
   textarea
     resize none
     height 200px!important
+  .fixed-width
+    width 80px
+    display inline-block
   display block!important
 
 .modal-backdrop

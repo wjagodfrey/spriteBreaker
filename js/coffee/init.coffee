@@ -33,6 +33,8 @@ tileImg.onload = ->
   .rect(0,0, 500,500)
   .fillStyle(backgroundTile)
   .fill()
+  # console.log JSON.stringify tileSource.context.getImageData(0,0,tileSource.canvas.width,tileSource.canvas.height)
+
 tileImg.src = './img/tile.png'
 drawBackgroundTiles = (ctx, zoom) ->
   if backgroundTile?
