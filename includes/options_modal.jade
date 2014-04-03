@@ -1,0 +1,51 @@
+.modal.ng-cloak(ng-if='optionsOpen' ng-controller='outputOptionsCtrl')#options_modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button' ng-click='$parent.$parent.$parent.optionsOpen = false') ×
+        h2.modal-title Settings
+      .modal-body
+        .form
+          h3 Output
+
+          hr
+
+          h4 naming convention
+          .radio
+            label
+              input(type='radio' value='array' ng-model='optionsCache.output.naming')
+              .fixed-width array
+              code [{"name":"mario", "actions:[{"name":"st...
+          .radio
+            label
+              input(type='radio' value='object' ng-model='optionsCache.output.naming')
+              .fixed-width object 
+              code {"mario":{"actions":{"stand":{"frames":...
+
+          hr
+
+          h4 frame output type
+          .radio
+            label
+              input(type='radio' value='array' ng-model='optionsCache.output.frame')
+              .fixed-width array
+              code [0,0,10,10]
+          .radio
+            label
+              input(type='radio' value='object' ng-model='optionsCache.output.frame')
+              .fixed-width object 
+              code {"x":0,"y":0,"width":10,"hei...
+          .radio
+            label
+              input(type='radio' value='png' ng-model='optionsCache.output.frame')
+              .fixed-width png data 
+              code data:image/png;base64,iVBORw...
+          .radio
+            label
+              input(type='radio' value='image' ng-model='optionsCache.output.frame')
+              .fixed-width image data 
+              code {"data":{"0":255,"1":255,"2"...
+
+      .modal-footer
+        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.optionsOpen = false') Close
+        button.btn.btn-primary(type='button' ng-click='save()') Save changes

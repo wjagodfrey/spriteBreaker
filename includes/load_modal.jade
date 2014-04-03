@@ -1,0 +1,38 @@
+.modal.ng-cloak(ng-if='loadOpen' ng-controller='loadModalCtrl')#load_modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button' ng-click='$parent.$parent.$parent.loadOpen = false') ×
+        h3.modal-title Load
+      .modal-body
+        .spritesheet(
+          ng-repeat='spritesheet in spritesheets'
+          ng-click='$parent.selected = spritesheet.id'
+          ng-class='{selected: $parent.selected == spritesheet.id}'
+        )
+          img(ng-src='{{spritesheet.image}}').img-thumbnail
+          .sprites
+            div(ng-repeat="sprite in spritesheet.sprites").sprite {{sprite.name}}
+
+          .button_wrapper(ng-hide='removeConfirmation')
+            button(
+              type='button'
+              ng-click='removeConfirmation = true'
+            ).btn.btn-xs.btn-danger
+              span.glyphicon.glyphicon-trash
+          .button_wrapper(ng-show='removeConfirmation')
+            button(
+              type='button'
+              ng-click='removeConfirmation = false'
+            ).btn.btn-xs.btn-danger
+              span.glyphicon.glyphicon-remove
+            button(
+              type='button'
+              ng-click='delete(selected)'
+            ).btn.btn-xs.btn-success
+              span.glyphicon.glyphicon-ok
+
+
+      .modal-footer
+        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.loadOpen = false') Close
+        button.btn.btn-primary(type='button' ng-click='load(selected)' ng-disabled="!selected") Load

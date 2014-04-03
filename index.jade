@@ -6,7 +6,7 @@ html(ng-app="app" ng-controller="appCtrl")
     title SpriteBreaker - Wilfred James Godfrey
     link(rel="stylesheet" type="text/css" href="./css/index.css")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
-  body(ng-class="{'modal-open':optionsOpen || infoOpen}")
+  body(ng-class="{'modal-open':optionsOpen || infoOpen || loadOpen}")
 
     //- wrapper
     .container.ng-cloak
@@ -28,152 +28,96 @@ html(ng-app="app" ng-controller="appCtrl")
                 .input-group
                   .input-group-addon
                     span.glyphicon.glyphicon-folder-open
-                  input(type="file", accept="image/*").form-control#filepath
+                  input(type='file', accept='image/*').form-control#filepath
 
                 .input-group
                   .input-group-addon
                     span.glyphicon.glyphicon-picture
-                  input(type="text" ng-model="imagedata").form-control.click-select#imagedata
+                  input(type='text' ng-model='imagedata').form-control.click-select#imagedata
 
                 //- label output
                 .input-group
                   .input-group-addon
                     span.glyphicon.glyphicon-circle-arrow-down
-                  textarea(type="text" ng-model="output").form-control.click-select#output
+                  textarea(type='text' ng-model='output').form-control.click-select#output
                 .input-group
                   .btn-group(style='margin-left:10px')
-                    button(type="button").btn.btn-sm.btn-primary Save
-                    button(type="button").btn.btn-sm.btn-primary Load
+                    button(type='button' ng-click="save()").btn.btn-sm.btn-primary Save
+                    button(type='button' ng-click='loadOpen = true').btn.btn-sm.btn-primary Load
                   .btn-group(style='margin-left:10px')
-                    button(type="button" ng-click="infoOpen = true").btn.btn-sm.btn-info
+                    button(type='button' ng-click='infoOpen = true').btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-question-sign
-                    button(type="button" ng-click="optionsOpen = true").btn.btn-sm.btn-info
+                    button(type='button' ng-click='optionsOpen = true').btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-cog
 
 
         //- right col
-        .col-xs-5
-          .row#list
+        .col-xs-5#list_wrapper
+          #list
             div(
-              ng-repeat="(spriteIndex, sprite) in sprites"
+              ng-repeat='(spriteIndex, sprite) in sprites'
             ).sprite
 
               .sprite_header(
-                ng-init="open = true"
-                ng-click="open = !open"
-                ng-class="{open:open}"
+                ng-init='open = true'
+                ng-click='open = !open'
+                ng-class='{open:open}'
               )
                 input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control.click-select
                 .button_wrapper
-                  button(type="button" ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
-                  button(type="button" ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
+                  button(type='button' ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
+                  button(type='button' ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
 
               div(
-                ng-repeat="(actionIndex, action) in sprite.actions"
-                ng-show="$parent.open"
+                ng-repeat='(actionIndex, action) in sprite.actions'
+                ng-show='$parent.open'
               ).action
 
                 .action_header(
-                  ng-init="open = true"
-                  ng-click="open = !open"
-                  ng-class="{open:open}"
+                  ng-init='open = true'
+                  ng-click='open = !open'
+                  ng-class='{open:open}'
                 )
                   input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control.click-select
-                  img(ng-src="{{getFrameImage(action.frames[action.$sb_currentFrame], 50, 50)}}")
+                  img(ng-src='{{getFrameImage(action.frames[action.$sb_currentFrame], 50, 50)}}')
                   .button_wrapper
-                    button(type="button" ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
-                    button(type="button" ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
+                    button(type='button' ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
+                    button(type='button' ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
                 div(
                   ng-repeat="(frameIndex, frameData) in action.frames"
-                  ng-show="$parent.open"
+                  ng-show='$parent.open'
                 ).frame
 
                   .frame_header(
-                    ng-click="setSelected(spriteIndex,actionIndex,frameIndex)"
-                    ng-class="{selected:isSelected(spriteIndex,actionIndex,frameIndex)}"
+                    ng-click='setSelected(spriteIndex,actionIndex,frameIndex)'
+                    ng-class='{selected:isSelected(spriteIndex,actionIndex,frameIndex)}'
                   )
-                    img(ng-src="{{getFrameImage(frameData, 50, 50)}}")
+                    img(ng-src='{{getFrameImage(frameData, 50, 50)}}')
                     .button_wrapper
-                      button(type="button" ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
+                      button(type='button' ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
 
-            button(type="button" ng-click="addSprite()").btn.btn-info#add_list
-              .span.glyphicon.glyphicon-plus-sign
-              | &nbsp; sprite
+          button(type='button' ng-click='addSprite()').btn.btn-info#add_sprite
+            .span.glyphicon.glyphicon-plus-sign
+            | &nbsp; sprite
 
 
-    .modal-backdrop(ng-if="optionsOpen || infoOpen" ng-click="optionsOpen = false; $parent.infoOpen = false")
+    .modal-backdrop(
+      ng-if='optionsOpen || infoOpen || loadOpen'
+      ng-click='$parent.$parent.optionsOpen = false; $parent.$parent.infoOpen = false; $parent.loadOpen = false;')
     //- output options modal
-    .modal.ng-cloak(ng-if="optionsOpen" ng-controller="outputOptionsCtrl")
-        .modal-dialog
-            .modal-content
-              .modal-header
-                button.close(type='button' aria-hidden='true' ng-click="$parent.$parent.optionsOpen = false") ×
-                h2.modal-title Settings
-              .modal-body
-                .form
-                  h3 Output
-
-                  hr
-
-                  h4 naming convention
-                  .radio
-                    label
-                      input(type='radio' value='array' ng-model="optionsCache.output.naming")
-                      .fixed-width array
-                      code [{"name":"mario", "actions:[{"name":"st...
-                  .radio
-                    label
-                      input(type='radio' value='object' ng-model="optionsCache.output.naming")
-                      .fixed-width object 
-                      code {"mario":{"actions":{"stand":{"frames":...
-
-                  hr
-
-                  h4 frame output type
-                  .radio
-                    label
-                      input(type='radio' value='array' ng-model="optionsCache.output.frame")
-                      .fixed-width array
-                      code [0,0,10,10]
-                  .radio
-                    label
-                      input(type='radio' value='object' ng-model="optionsCache.output.frame")
-                      .fixed-width object 
-                      code {"x":0,"y":0,"width":10,"hei...
-                  .radio
-                    label
-                      input(type='radio' value='png' ng-model="optionsCache.output.frame")
-                      .fixed-width png data 
-                      code data:image/png;base64,iVBORw...
-                  .radio
-                    label
-                      input(type='radio' value='image' ng-model="optionsCache.output.frame")
-                      .fixed-width image data 
-                      code {"data":{"0":255,"1":255,"2"...
-
-              .modal-footer
-                button.btn.btn-default(type='button' ng-click="$parent.$parent.optionsOpen = false") Close
-                button.btn.btn-primary(type='button' ng-click="save()") Save changes
+    span(ng-include='"./includes/options_modal.html"')
 
     //- info modal
-    .modal.ng-cloak(ng-if="infoOpen" ng-controller="infoModalCtrl")
-        .modal-dialog
-            .modal-content
-              .modal-header
-                button.close(type='button' aria-hidden='true' ng-click="$parent.$parent.infoOpen = false") ×
-                h3.modal-title Info
-              .modal-body
-                | info info
-              .modal-footer
-                button.btn.btn-default(type='button' ng-click="$parent.$parent.infoOpen = false") Close
-                button.btn.btn-primary(type='button' ng-click="save()") Save changes
+    span(ng-include='"./includes/info_modal.html"')
+
+    //- load modal
+    span(ng-include='"./includes/load_modal.html"')
 
 
 
-
-    script(src="./js/angular.js")
-    script(src="./js/jquery-2.1.0.js")
-    script(src="./js/jquery.mousewheel.js")
-    script(src="./js/canvasquery.js")
-    script(src="./js/canvasquery.framework.js")
-    script(src="./js/index.js")
+    script(src='./js/angular.js')
+    script(src='./js/jquery-2.1.0.js')
+    script(src='./js/jquery.mousewheel.js')
+    script(src='./js/canvasquery.js')
+    script(src='./js/canvasquery.framework.js')
+    script(src='./js/index.js')

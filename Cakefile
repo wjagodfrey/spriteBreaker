@@ -21,7 +21,7 @@ task 'build', 'Watch all jade, stylus and coffeescript files and build appropria
   console.log '============'.bold.cyan, 'OUTPUT'.bold.magenta, '============'.bold.cyan, '\n'
 
   questTask = exec "
-    jade --watch *.jade &
+    jade --watch */*.jade *.jade  &
     coffee -w -j js/index.js -c #{jsFiles} &
     stylus -w css/ && fg
   ", (err, stdout, stderr) ->

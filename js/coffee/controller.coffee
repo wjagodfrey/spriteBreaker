@@ -13,6 +13,8 @@ app.controller 'appCtrl', [
     selectorCanvas[0].width = selectorCanvas.parent().width()
     selectorCanvas[0].height = 250
 
+    spritesheetID = undefined
+
     scope.options =
       output:
         frame: 'array'
@@ -23,33 +25,6 @@ app.controller 'appCtrl', [
       action : 0
       frame  : 0
 
-
-    # watch imagedata input for new imagedata
-    scope.$watch 'imagedata', (imgData) ->
-      reset()
-      scope.sprites = []
-      img.src = imgData
-
-      #DEV
-      # scope.optionsOpen = true
-      scope.sprites = [
-        {
-          name    : 'roboto'
-          actions : [
-            {
-              name         : 'walk_up'
-              $sb_currentFrame : 0
-              frames       : [
-                [1,30, 6,26]
-                [1,59, 6,26]
-                [1,88, 6,26]
-                [1,117, 6,26]
-              ]
-            }
-          ]
-        }
-      ]
-
     ###
     LISTENERS
     ###
@@ -57,10 +32,8 @@ app.controller 'appCtrl', [
     # keep output string updated
     scope.$watch '[sprites, options]', ([sprites, options]) ->
       opt = options.output
-
       #begin output
       output = if opt.naming is 'object' then '{' else '['
-
       ###
       sprite loop
       ###
@@ -75,13 +48,12 @@ app.controller 'appCtrl', [
           ai = parseInt ai
           # begin action
           output += if opt.naming is 'object' then "'#{action.name}':{'frames':[" else "{'name':'#{action.name}','frames':["
-
           ###
           frame loop
           ###
           for fi, frame of action.frames
             fi = parseInt fi
-            # begin action
+            # frame
             output += (
               if opt.frame is 'array'
                 "#{JSON.stringify frame}"
@@ -93,7 +65,6 @@ app.controller 'appCtrl', [
                 "#{JSON.stringify getPixelData('img', img, frame)}"
             )
             if fi isnt action.frames.length-1 then output += ','
-
           # close action
           output += if opt.naming is 'object' then ']}' else ']}'
           if ai isnt sprite.actions.length-1 then output += ','
@@ -102,9 +73,34 @@ app.controller 'appCtrl', [
         if si isnt scope.sprites.length-1 then output += ','
       # close output
       output += if opt.naming is 'object' then '}' else ']'
-
       scope.output = output.replace /\'/g, '"'
     , true
+
+    # watch imagedata input for new imagedata
+    scope.$watch 'imagedata', (imgData) ->
+      reset()
+      scope.sprites = []
+      img.src = imgData
+      #DEV
+      # scope.optionsOpen = true
+      scope.sprites = [
+        {
+          name    : 'roboto'
+          actions : [
+            {
+              name             : 'walk_up'
+              $sb_currentFrame : 0
+              frames           : [
+                [1,30, 6,26]
+                [1,59, 6,26]
+                [1,88, 6,26]
+                [1,117, 6,26]
+              ]
+            }
+          ]
+        }
+      ]
+      # scope.loadOpen = true
 
     # when you leave the window or tab
     $(window).on 'blur', ->
@@ -220,6 +216,25 @@ app.controller 'appCtrl', [
     scope.removeFrame = (spriteIndex, actionIndex, frameIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1)
 
+    save = scope.save = ->
+      if localStorage?
+
+        if not localStorage.spritesheets
+          localStorage.spritesheets = '{}'
+
+        localSpritesheets = JSON.parse(localStorage.spritesheets)
+
+        spritesheet =
+          id: spritesheetID or spritesheetID = (new Date().getTime())
+          sprites: scope.sprites
+          image: img.src
+          options: scope.options
+
+        localSpritesheets[spritesheet.id] = spritesheet
+        
+        localStorage.spritesheets = JSON.stringify( localSpritesheets )
+
+
     ###
     CONTROLLERS
     ###
@@ -227,7 +242,6 @@ app.controller 'appCtrl', [
       '$scope'
       (scope) ->
         scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
-        console.log scope.$parent.$parent.options
         scope.save = ->
           $.extend scope.$parent.$parent.options, scope.optionsCache
           scope.$parent.$parent.optionsOpen = false
@@ -236,10 +250,28 @@ app.controller 'appCtrl', [
       '$scope'
       (scope) ->
         scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
-        console.log scope.$parent.$parent.options
         scope.save = ->
           $.extend scope.$parent.$parent.options, scope.optionsCache
           scope.$parent.$parent.optionsOpen = false
+    ]
+    scope.loadModalCtrl = [
+      '$scope'
+      (scope) ->
+        scope.spritesheets = []
+        if localStorage? then scope.spritesheets = JSON.parse(localStorage.spritesheets)
+
+        scope.delete = (id) ->
+          scope.spritesheets[id] = undefined
+          delete scope.spritesheets[id]
+          localStorage.spritesheets = JSON.stringify( scope.spritesheets )
+
+        scope.load = (id) ->
+          sheet         = scope.spritesheets[id]
+          spritesheetID = id
+          img.src       = sheet.image
+          scope.$parent.$parent.$parent.sprites  = sheet.sprites
+          scope.$parent.$parent.$parent.options  = sheet.options
+          scope.$parent.$parent.$parent.loadOpen = false
     ]
 
     ###

@@ -27,16 +27,11 @@ PNGCanvas = cq()
 
   PNGCanvas
   .clear()
-
   .save()
   .translate((PNGCanvas.canvas.width-selectionWidth*imgResizeFactor)/2, (PNGCanvas.canvas.height-selectionHeight*imgResizeFactor)/2)
   .drawImage(canvas, selectionX,selectionY, selectionWidth, selectionHeight, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor)
-  # .drawImage(canvas, 0,0, selectionWidth * imgResizeFactor, selectionHeight)
   .restore()
 
-
-
-  # .drawImage(canvas, coords[0],coords[1],coords[2],coords[3], 0,0,width,height)
   if type is 'png'
     PNGCanvas.canvas.toDataURL()
   else
