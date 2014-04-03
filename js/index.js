@@ -152,45 +152,52 @@ GLOBAL UTIL
       LISTENERS
        */
       scope.$watch('[sprites, options]', function(_arg) {
-        var action, frame, i, opt, options, output, sprite, sprites, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+        var action, ai, fi, frame, opt, options, output, si, sprite, sprites, _ref, _ref1, _ref2;
         sprites = _arg[0], options = _arg[1];
         opt = options.output;
-        output = (opt.naming === 'object' ? '{' : '[');
+        output = opt.naming === 'object' ? '{' : '[';
 
         /*
         sprite loop
          */
         _ref = scope.sprites;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          sprite = _ref[_i];
-          output += (opt.naming === 'object' ? "'" + sprite.name + "':{'actions':{" : "{'name':'" + sprite.name + "','actions':[");
+        for (si in _ref) {
+          sprite = _ref[si];
+          si = parseInt(si);
+          output += opt.naming === 'object' ? "'" + sprite.name + "':{'actions':{" : "{'name':'" + sprite.name + "','actions':[";
 
           /*
           action loop
            */
           _ref1 = sprite.actions;
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            action = _ref1[_j];
-            output += (opt.naming === 'object' ? "'" + action.name + "':{'frames':[" : "{'name':'" + action.name + "','frames':[");
+          for (ai in _ref1) {
+            action = _ref1[ai];
+            ai = parseInt(ai);
+            output += opt.naming === 'object' ? "'" + action.name + "':{'frames':[" : "{'name':'" + action.name + "','frames':[";
 
             /*
             frame loop
              */
             _ref2 = action.frames;
-            for (i in _ref2) {
-              frame = _ref2[i];
-              i = parseInt(i);
+            for (fi in _ref2) {
+              frame = _ref2[fi];
+              fi = parseInt(fi);
               output += (opt.frame === 'array' ? "" + (JSON.stringify(frame)) : opt.frame === 'object' ? "{'x':" + frame[0] + ",'y':" + frame[1] + ",'width':" + frame[2] + ",'height':" + frame[3] + "}" : opt.frame === 'png' ? "'" + (getPixelData('png', img, frame)) + "'" : opt.frame === 'image' ? "" + (JSON.stringify(getPixelData('img', img, frame))) : void 0);
-              console.log(i, action.frames.length - 1);
-              if (i !== action.frames.length - 1) {
+              if (fi !== action.frames.length - 1) {
                 output += ',';
               }
             }
-            output += (opt.naming === 'object' ? "]}" : "]}");
+            output += opt.naming === 'object' ? ']}' : ']}';
+            if (ai !== sprite.actions.length - 1) {
+              output += ',';
+            }
           }
-          output += (opt.naming === 'object' ? "}}" : "]}");
+          output += opt.naming === 'object' ? '}}' : ']}';
+          if (si !== scope.sprites.length - 1) {
+            output += ',';
+          }
         }
-        output += (opt.naming === 'object' ? "}" : "]");
+        output += opt.naming === 'object' ? '}' : ']';
         return scope.output = output.replace(/\'/g, '"');
       }, true);
       $(window).on('blur', function() {

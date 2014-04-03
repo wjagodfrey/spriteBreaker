@@ -38,7 +38,7 @@ input[type=file] {
 }
 #output {
   resize: none;
-  height: 200px;
+  height: 65px;
 }
 list_item,
 #list .sprite_header,

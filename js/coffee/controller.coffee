@@ -59,40 +59,28 @@ app.controller 'appCtrl', [
       opt = options.output
 
       #begin output
-      output = (
-        if opt.naming is 'object'
-          '{'
-        else # array
-          '['
-      )
+      output = if opt.naming is 'object' then '{' else '['
 
       ###
       sprite loop
       ###
-      for sprite in scope.sprites
+      for si, sprite of scope.sprites
+        si = parseInt si
         # begin sprite
-        output += (
-          if opt.naming is 'object'
-            "'#{sprite.name}':{'actions':{"
-          else # array
-            "{'name':'#{sprite.name}','actions':["
-        )
+        output += if opt.naming is 'object' then "'#{sprite.name}':{'actions':{" else "{'name':'#{sprite.name}','actions':["
         ###
         action loop
         ###
-        for action in sprite.actions
+        for ai, action of sprite.actions
+          ai = parseInt ai
           # begin action
-          output += (
-            if opt.naming is 'object'
-              "'#{action.name}':{'frames':["
-            else # array
-              "{'name':'#{action.name}','frames':["
-          )
+          output += if opt.naming is 'object' then "'#{action.name}':{'frames':[" else "{'name':'#{action.name}','frames':["
+
           ###
           frame loop
           ###
-          for i, frame of action.frames
-            i = parseInt i
+          for fi, frame of action.frames
+            fi = parseInt fi
             # begin action
             output += (
               if opt.frame is 'array'
@@ -104,30 +92,16 @@ app.controller 'appCtrl', [
               else if opt.frame is 'image'
                 "#{JSON.stringify getPixelData('img', img, frame)}"
             )
-            console.log i, action.frames.length-1
-            if i isnt action.frames.length-1 then output += ','
+            if fi isnt action.frames.length-1 then output += ','
 
           # close action
-          output += (
-            if opt.naming is 'object'
-              "]}"
-            else # array
-              "]}"
-          )
+          output += if opt.naming is 'object' then ']}' else ']}'
+          if ai isnt sprite.actions.length-1 then output += ','
         # close sprite
-        output += (
-          if opt.naming is 'object'
-            "}}"
-          else # array
-            "]}"
-        )
+        output += if opt.naming is 'object' then '}}' else ']}'
+        if si isnt scope.sprites.length-1 then output += ','
       # close output
-      output += (
-        if opt.naming is 'object'
-          "}"
-        else # array
-          "]"
-      )
+      output += if opt.naming is 'object' then '}' else ']'
 
       scope.output = output.replace /\'/g, '"'
     , true
