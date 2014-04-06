@@ -11,12 +11,23 @@
 
         h4 Quick start guide
         ol
-          li Load an image using file selector
+          li Load an image using the file selector
           li Add and name a new sprite 
             code eg "mario"
           li Add and name a new action 
             code eg "stand"
           li Add a new frame
-          li 
+          li Set frame coordinates
+          li Repeat
+        ul
+          li Scroll and click on the small canvas to set the view area
+          li Left click on the large canvas to set the top left frame coordinate
+          li Right click on the large canvas to set the bottom right frame coordinate
+          li Scroll on the large canvas to zoom in and out
+        ul
+          li You can save and load using the buttons at the bottom middle.
+          li You can change the output fomat in the options dialog (the 
+          span.glyphicon.glyphicon-cog
+          |  button)
       .modal-footer
         button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') Close
