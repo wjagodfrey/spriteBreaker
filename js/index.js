@@ -119,6 +119,9 @@ GLOBAL UTIL
       INIT
        */
       var horizontalEdgeAdjustment, navigatorCq, navigatorSelectionHeight, navigatorSelectionWidth, save, selectorCq, spritesheetID, verticalEdgeAdjustment;
+      if ((typeof localStorage !== "undefined" && localStorage !== null) && !localStorage.spritesheets) {
+        localStorage.spritesheets = '{}';
+      }
       navigatorCanvas[0].width = navigatorCanvas.parent().width();
       navigatorCanvas[0].height = 200;
       selectorCanvas[0].width = selectorCanvas.parent().width();
@@ -355,9 +358,6 @@ GLOBAL UTIL
       save = scope.save = function() {
         var localSpritesheets, spritesheet;
         if (typeof localStorage !== "undefined" && localStorage !== null) {
-          if (!localStorage.spritesheets) {
-            localStorage.spritesheets = '{}';
-          }
           localSpritesheets = JSON.parse(localStorage.spritesheets);
           spritesheet = {
             id: spritesheetID || (spritesheetID = new Date().getTime()),

@@ -8,6 +8,10 @@ app.controller 'appCtrl', [
     INIT
     ###
 
+    if localStorage? and not localStorage.spritesheets
+      localStorage.spritesheets = '{}'
+
+
     navigatorCanvas[0].width = navigatorCanvas.parent().width()
     navigatorCanvas[0].height = 200
     selectorCanvas[0].width = selectorCanvas.parent().width()
@@ -215,9 +219,6 @@ app.controller 'appCtrl', [
 
     save = scope.save = ->
       if localStorage?
-
-        if not localStorage.spritesheets
-          localStorage.spritesheets = '{}'
 
         localSpritesheets = JSON.parse(localStorage.spritesheets)
 
