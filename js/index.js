@@ -393,14 +393,31 @@ GLOBAL UTIL
       ];
       scope.loadModalCtrl = [
         '$scope', function(scope) {
-          scope.spritesheets = [];
+          scope.spritesheets = {};
           if (typeof localStorage !== "undefined" && localStorage !== null) {
             scope.spritesheets = JSON.parse(localStorage.spritesheets);
           }
+          scope.$watch('spritesheets', function() {
+            var k;
+            scope.noSheets = !((function() {
+              var _results;
+              _results = [];
+              for (k in scope.spritesheets) {
+                _results.push((function() {
+                  return true;
+                })());
+              }
+              return _results;
+            })()).length;
+            return console.log(scope.noSheets, scope.spritesheets);
+          }, true);
           scope["delete"] = function(id) {
             scope.spritesheets[id] = void 0;
             delete scope.spritesheets[id];
-            return localStorage.spritesheets = JSON.stringify(scope.spritesheets);
+            localStorage.spritesheets = JSON.stringify(scope.spritesheets);
+            if (scope.selected === id) {
+              return scope.selected = false;
+            }
           };
           return scope.load = function(id) {
             var sheet;

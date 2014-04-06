@@ -5,6 +5,7 @@
         button.close(type='button' ng-click='$parent.$parent.$parent.loadOpen = false') ×
         h3.modal-title Load
       .modal-body
+        div(ng-if="noSheets").alert.alert-info There are no saves
         .spritesheet(
           ng-repeat='spritesheet in spritesheets'
           ng-click='$parent.selected = spritesheet.id'

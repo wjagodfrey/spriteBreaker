@@ -255,13 +255,19 @@ app.controller 'appCtrl', [
     scope.loadModalCtrl = [
       '$scope'
       (scope) ->
-        scope.spritesheets = []
+        scope.spritesheets = {}
         if localStorage? then scope.spritesheets = JSON.parse(localStorage.spritesheets)
+
+        scope.$watch 'spritesheets', ->
+          scope.noSheets = !(for k of scope.spritesheets then do -> return true).length
+          console.log scope.noSheets, scope.spritesheets
+        , true
 
         scope.delete = (id) ->
           scope.spritesheets[id] = undefined
           delete scope.spritesheets[id]
           localStorage.spritesheets = JSON.stringify( scope.spritesheets )
+          if scope.selected is id then scope.selected = false
 
         scope.load = (id) ->
           sheet         = scope.spritesheets[id]
