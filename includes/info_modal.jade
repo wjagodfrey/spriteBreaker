@@ -1,19 +1,22 @@
 .modal.ng-cloak(ng-if='infoOpen' ng-controller='infoModalCtrl')#info_modal
   .modal-dialog
     .modal-content
-      .modal-header
-        button.close(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') ×
-        h4.modal-title Info
+      //- .modal-header
       .modal-body
-        h3 Quick start guide
+        button.close(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') ×
+        h3 About
+        | SpriteBreaker is an open source web based sprite management tool build by 
+        a(href="" style="white-space:nowrap") Wilfred Godfrey
+        |. SpriteBreaker aims to make managing and updating spritesheets as simple as possible.
+
+        h4 Quick start guide
         ol
           li Load an image using file selector
-          li Add and name a new sprite
+          li Add and name a new sprite 
             code eg "mario"
-          li Add and name a new action
+          li Add and name a new action 
             code eg "stand"
           li Add a new frame
           li 
       .modal-footer
         button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') Close
-        button.btn.btn-primary(type='button' ng-click='save()') Save changes

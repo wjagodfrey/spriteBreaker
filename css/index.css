@@ -153,6 +153,7 @@ list_caret.open::before,
 #list_wrapper .frame_header {
   padding-left: 40px;
   background: #fecd8f;
+  color: #d37702;
 }
 #list_wrapper .frame_header.selected {
   background: #e5f9c2;

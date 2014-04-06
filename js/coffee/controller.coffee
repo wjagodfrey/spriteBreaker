@@ -82,7 +82,7 @@ app.controller 'appCtrl', [
       scope.sprites = []
       img.src = imgData
       #DEV
-      # scope.optionsOpen = true
+      # scope.infoOpen = true
       scope.sprites = [
         {
           name    : 'roboto'
@@ -100,7 +100,6 @@ app.controller 'appCtrl', [
           ]
         }
       ]
-      # scope.loadOpen = true
 
     # when you leave the window or tab
     $(window).on 'blur', ->
@@ -134,17 +133,14 @@ app.controller 'appCtrl', [
     selectorCanvas.on 'mousewheel', (e) ->
       e.preventDefault()
       if e.deltaY and navigatorSelection.x? and navigatorSelection.y?
+
         zoomCache = navigatorSelection.zoom
         navigatorCursor.zoom = navigatorSelection.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
+
         if navigatorSelection.zoom < 0.1 then navigatorSelection.zoom = 0.1
         if navigatorSelection.zoom > 1 then navigatorSelection.zoom = 1
         if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
         if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
-        xPercentage = selectorMouseCoords.x / selectorCanvas.width()
-        yPercentage = selectorMouseCoords.y / selectorCanvas.height()
-        if zoomDifference = zoomCache - navigatorSelection.zoom
-          navigatorSelection.x      = (navigatorSelection.x + (selectorCq.canvas.width * zoomDifference) * xPercentage)
-          navigatorSelection.y      = (navigatorSelection.y + (selectorCq.canvas.height * zoomDifference) * yPercentage)
 
     # load new image on file select
     fileSelect.on 'change', (e) ->
@@ -175,14 +171,15 @@ app.controller 'appCtrl', [
       result
 
     scope.addSprite = ->
-      scope.sprites.push
-        name    : 'sprite'
-        actions : []
-      # select new input
-      $timeout ->
-        $('.sprite_header input')
-        .eq(scope.sprites.length - 1)
-        .select()
+      if scope.imagedata
+        scope.sprites.push
+          name    : 'sprite'
+          actions : []
+        # select new input
+        $timeout ->
+          $('.sprite_header input')
+          .eq(scope.sprites.length - 1)
+          .select()
     scope.removeSprite = (spriteIndex) ->
       scope.sprites.splice(spriteIndex, 1)
 
@@ -277,11 +274,15 @@ app.controller 'appCtrl', [
     ###
     IMAGE NAVIGATOR FRAMEWORK
     ###
+    horizontalEdgeAdjustment = 0
+    verticalEdgeAdjustment   = 0
+    navigatorSelectionWidth  = 0
+    navigatorSelectionHeight  = 0
     navigatorCq = cq(navigatorCanvas[0]).framework
-      onmouseup: ->
+      onmouseup: (x, y) ->
         navigatorSelection.zoom = navigatorCursor.zoom
-        navigatorSelection.x    = navigatorCursor.x
-        navigatorSelection.y    = navigatorCursor.y
+        navigatorSelection.x    = (Math.floor(x) - horizontalEdgeAdjustment) / imgResizeFactor
+        navigatorSelection.y    = (Math.floor(y) - verticalEdgeAdjustment) / imgResizeFactor
 
       onmousemove: (x, y) ->
         navigatorMouseCoords =
@@ -297,80 +298,79 @@ app.controller 'appCtrl', [
 
         @clear()
         drawBackgroundTiles @, 1
-        if img.src
 
+        if scope.imagedata
+          if img.src
 
-          imgResizeFactor = Math.min(@canvas.height / img.height, @canvas.width / img.width)
+            horizontalEdgeAdjustment = (navigatorCanvas.width() - img.width * imgResizeFactor) / 2
+            verticalEdgeAdjustment   = (navigatorCanvas.height() - img.height * imgResizeFactor) / 2
+            navigatorSelectionWidth  = selectorCanvas.width() * navigatorSelection.zoom
+            navigatorSelectionHeight = selectorCanvas.height() * navigatorSelection.zoom
 
-          navigatorCursor.width  = selectorCq.canvas.width * navigatorCursor.zoom
-          navigatorCursor.height = selectorCq.canvas.height * navigatorCursor.zoom
-          navigatorCursor.x      = navigatorMouseCoords.x - navigatorCursor.width / 2
-          navigatorCursor.y      = navigatorMouseCoords.y - navigatorCursor.height / 2
+            imgResizeFactor = Math.min(@canvas.height / img.height, @canvas.width / img.width)
 
-          @save()
-          .translate((@canvas.width - img.width * imgResizeFactor) / 2, (@canvas.height - img.height * imgResizeFactor) / 2)
-          .drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor)
-          .restore()
-
-          if mouseOverNavigator
-            # draw view selector
             @save()
-            .translate(navigatorCursor.x,navigatorCursor.y)
-            .save()
-            .globalAlpha(0.3)
-            .fillStyle(navigatorCursor.color)
-            .fillRect(0,0, navigatorCursor.width,navigatorCursor.height)
-            .restore()
-            .strokeStyle(navigatorCursor.color)
-            .strokeRect(0,0, navigatorCursor.width,navigatorCursor.height)
+            .translate(horizontalEdgeAdjustment, verticalEdgeAdjustment)
+            .drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor)
             .restore()
 
-          # draw view selection
-          if navigatorSelection.x? and navigatorSelection.y?
-            @save()
-            .translate(navigatorSelection.x,navigatorSelection.y)
-            .save()
-            .globalAlpha(0.3)
-            .fillStyle(navigatorSelection.color)
-            .fillRect(0,0, selectorCanvas.width() * navigatorSelection.zoom,selectorCanvas.height() * navigatorSelection.zoom)
-            .restore()
-            .strokeStyle(navigatorSelection.color)
-            .strokeRect(0,0, selectorCanvas.width() * navigatorSelection.zoom,selectorCanvas.height() * navigatorSelection.zoom)
-            .restore()
+            if mouseOverNavigator
+              navigatorCursorWidth  = selectorCanvas.width() * navigatorCursor.zoom
+              navigatorCursorHeight = selectorCanvas.height() * navigatorCursor.zoom
+              navigatorCursor.x      = navigatorMouseCoords.x - navigatorCursorWidth / 2
+              navigatorCursor.y      = navigatorMouseCoords.y - navigatorCursorHeight / 2
+
+              # draw view selector
+              @save()
+              .translate(
+                navigatorCursor.x
+                navigatorCursor.y
+                )
+              .save()
+              .globalAlpha(0.3)
+              .fillStyle(navigatorCursor.color)
+              .fillRect(0,0, navigatorCursorWidth,navigatorCursorHeight)
+              .restore()
+              .strokeStyle(navigatorCursor.color)
+              .strokeRect(0,0, navigatorCursorWidth,navigatorCursorHeight)
+              .restore()
+
+            # draw view selection
+            if navigatorSelection.x? and navigatorSelection.y?
+
+
+              @save()
+              .translate(
+                navigatorSelection.x * imgResizeFactor - (navigatorSelectionWidth / 2) + horizontalEdgeAdjustment
+                navigatorSelection.y * imgResizeFactor - (navigatorSelectionHeight / 2) + verticalEdgeAdjustment
+              )
+              .save()
+              .globalAlpha(0.3)
+              .fillStyle(navigatorSelection.color)
+              .fillRect(0,0, selectorCanvas.width() * navigatorSelection.zoom,selectorCanvas.height() * navigatorSelection.zoom)
+              .restore()
+              .strokeStyle(navigatorSelection.color)
+              .strokeRect(0,0, selectorCanvas.width() * navigatorSelection.zoom,selectorCanvas.height() * navigatorSelection.zoom)
+              .restore()
 
 
     ###
     SELECTOR FRAMEWORK
     ###
-    horizontalEdgeAdjustment = 0
-    verticalEdgeAdjustment   = 0
     selectorCq = cq(selectorCanvas[0]).framework
       onmousemove: (x, y) ->
         selectorMouseCoords =
           x: x
           y: y
 
-      onmousedown: (x,y,btn)->
-
+      onmousedown: (x, y, btn)->
+        # adjust selected frame coordinates
         s = scope.getSelected()
         if s
-          # remap x and y to match position on spritesheet file
-          x = Math.floor(
-            (
-              x -
-              horizontalEdgeAdjustment / navigatorSelection.zoom +
-              navigatorSelection.x / navigatorSelection.zoom +
-              0.5
-            ) * navigatorSelection.zoom
-          )
-          y = Math.floor(
-            (
-              y -
-              verticalEdgeAdjustment / navigatorSelection.zoom +
-              navigatorSelection.y / navigatorSelection.zoom +
-              0.5
-            ) * navigatorSelection.zoom
-          )
+          imgX = (navigatorSelection.x * imgResizeFactor - navigatorSelectionWidth / 2) / navigatorSelection.zoom
+          imgY = (navigatorSelection.y * imgResizeFactor - navigatorSelectionHeight / 2) / navigatorSelection.zoom
+          x = Math.floor((x + imgX) / imgResizeFactor * navigatorSelection.zoom)
+          y = Math.floor((y + imgY) / imgResizeFactor * navigatorSelection.zoom)
           # left mouse button, set top left frame pos
           if btn is 0
             scope.$apply ->
@@ -388,7 +388,6 @@ app.controller 'appCtrl', [
                 s[3] = y - s[1]
 
       onrender: (delta, time) ->
-
         # make resizeds show pixel edges
         @context.mozImageSmoothingEnabled =
         @context.webkitImageSmoothingEnabled =
@@ -399,69 +398,78 @@ app.controller 'appCtrl', [
         @clear()
         drawBackgroundTiles @, navigatorSelection.zoom
 
-        horizontalEdgeAdjustment = (navigatorCanvas.width() - img.width * imgResizeFactor) / 2 / imgResizeFactor
-        verticalEdgeAdjustment = (navigatorCanvas.height() - img.height * imgResizeFactor) / 2 / imgResizeFactor
+        if scope.imagedata
 
-        if navigatorSelection.x? and navigatorSelection.y?
-          @drawImage(
-            # source
-            img,
-            # from coords and widths
-            navigatorSelection.x - horizontalEdgeAdjustment,
-            navigatorSelection.y - verticalEdgeAdjustment,
-            (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor,
-            (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor,
-            # to coords and widths
-            0,
-            0,
-            @canvas.width,
-            @canvas.height
-          )
+          if navigatorSelection.x? and navigatorSelection.y?
 
-          # draw sprite selections
-          for spriteIndex, sprite of scope.sprites
-            if !sprite.hidden
-              for actionIndex, action of sprite.actions
-                if !action.hidden
-                  for frameIndex, frame of action.frames
-                    if !frame.hidden
+            drawX = navigatorSelection.x - (navigatorSelectionWidth / imgResizeFactor / 2)
+            drawY = navigatorSelection.y - (navigatorSelectionHeight / imgResizeFactor / 2)
 
-                      if frame[0]? and frame[1]?
+            @drawImage(
+              # source
+              img,
+              # FROM coords and widths
+              drawX,
+              drawY,
+              (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor,
+              (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor,
+              # TO coords and widths
+              0,
+              0,
+              @canvas.width,
+              @canvas.height
+            )
 
-                        spriteIndex = parseInt spriteIndex
-                        actionIndex = parseInt actionIndex
-                        frameIndex = parseInt frameIndex
+            # draw sprite selections
+            # return
+            for spriteIndex, sprite of scope.sprites
+              if !sprite.hidden
+                for actionIndex, action of sprite.actions
+                  if !action.hidden
+                    for frameIndex, frame of action.frames
+                      if !frame.hidden
 
-                        frameX      = (frame[0] - navigatorSelection.x + horizontalEdgeAdjustment) / navigatorSelection.zoom
-                        frameY      = (frame[1] - navigatorSelection.y + verticalEdgeAdjustment) / navigatorSelection.zoom
-                        frameWidth  = frame[2] / navigatorSelection.zoom
-                        frameHeight = frame[3] / navigatorSelection.zoom
+                        if frame[0]? and frame[1]?
 
-                        selected  = scope.selectedFrame.sprite is spriteIndex and
-                        scope.selectedFrame.action is actionIndex and
-                        scope.selectedFrame.frame is frameIndex
-                        frameColor = if selected then '#c80819' else '#21d4cc'
+                          spriteIndex = parseInt spriteIndex
+                          actionIndex = parseInt actionIndex
+                          frameIndex  = parseInt frameIndex
 
-                        @save()
-                        .translate(frameX,frameY)
+                          frmX      = frame[0]
+                          frmY      = frame[1]
+                          frmWidth  = frame[2]
+                          frmHeight = frame[3]
 
-                        .save()
-                        .globalAlpha(0.3)
-                        .fillStyle(frameColor)
-                        .fillRect(0,0, frameWidth,frameHeight)
-                        .restore()
+                          frmX      = (frmX - drawX) * imgResizeFactor / navigatorSelection.zoom
+                          frmY      = (frmY - drawY) * imgResizeFactor / navigatorSelection.zoom
+                          frmWidth  = frmWidth * imgResizeFactor / navigatorSelection.zoom
+                          frmHeight = frmHeight * imgResizeFactor / navigatorSelection.zoom
 
-                        .strokeStyle(frameColor)
-                        .strokeRect(0,0, frameWidth,frameHeight)
-                        .restore()
+                          selected  = scope.selectedFrame.sprite is spriteIndex and
+                          scope.selectedFrame.action is actionIndex and
+                          scope.selectedFrame.frame is frameIndex
+                          frameColor = if selected then '#c80819' else '#21d4cc'
 
-                        # draw top left and bottom right boxes if selected
-                        if selected
-                          @fillStyle('#fea00e')
-                          @fillRect(frameX-2,frameY-2, 4,4)
-                          if frame[2]? and frame[3]?
-                            @fillStyle('#24ffae')
-                            @fillRect(frameX+frameWidth-2,frameY+frameHeight-2, 4,4)
+                          @save()
+                          .translate(frmX,frmY)
+
+                          .save()
+                          .globalAlpha(0.3)
+                          .fillStyle(frameColor)
+                          .fillRect(0,0, frmWidth,frmHeight)
+                          .restore()
+
+                          .strokeStyle(frameColor)
+                          .strokeRect(0,0, frmWidth,frmHeight)
+                          .restore()
+
+                          # draw top left and bottom right boxes if selected
+                          if selected
+                            @fillStyle('#fea00e')
+                            @fillRect(frmX-2,frmY-2, 4,4)
+                            if frame[2]? and frame[3]?
+                              @fillStyle('#24ffae')
+                              @fillRect(frmX+frmWidth-2,frmY+frmHeight-2, 4,4)
 
 
 
