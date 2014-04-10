@@ -108,6 +108,8 @@ app.controller 'appCtrl', [
     # when you leave the window or tab
     $(window).on 'blur', ->
       mouseOverNavigator = false
+      navigatorMouseDown = false
+      selectorMouseDown = false
 
     # elements with the click-select class will be selected on focus
     $('body').on 'focus', '.click-select', (e) ->
@@ -128,23 +130,15 @@ app.controller 'appCtrl', [
     # zoom navigator selection cursor on navigator canvas scroll
     navigatorCanvas.on 'mousewheel', (e) ->
       e.preventDefault()
-      if e.deltaY
-        navigatorCursor.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
-        if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
-        if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
+      if not navigatorMouseDown
+        if e.deltaY
+          navigatorCursor.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
+          if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
+          if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
+          # if navigatorMouseDown
+          #   navigatorSelection.zoom = navigatorCursor.zoom
 
-    # zoom navigator selection selection canvas on scroll
-    selectorCanvas.on 'mousewheel', (e) ->
-      e.preventDefault()
-      if e.deltaY and navigatorSelection.x? and navigatorSelection.y?
-
-        zoomCache = navigatorSelection.zoom
-        navigatorCursor.zoom = navigatorSelection.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
-
-        if navigatorSelection.zoom < 0.1 then navigatorSelection.zoom = 0.1
-        if navigatorSelection.zoom > 1 then navigatorSelection.zoom = 1
-        if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
-        if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
+    #     if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
 
     # load new image on file select
     fileSelect.on 'change', (e) ->
@@ -281,20 +275,31 @@ app.controller 'appCtrl', [
     ###
     IMAGE NAVIGATOR FRAMEWORK
     ###
+    adjustNavigatorSelection = (x, y) ->
+      navigatorSelection.zoom = navigatorCursor.zoom
+      navigatorSelection.x    = (Math.floor(x) - horizontalEdgeAdjustment) / imgResizeFactor
+      navigatorSelection.y    = (Math.floor(y) - verticalEdgeAdjustment) / imgResizeFactor
+
     horizontalEdgeAdjustment = 0
     verticalEdgeAdjustment   = 0
     navigatorSelectionWidth  = 0
     navigatorSelectionHeight  = 0
     navigatorCq = cq(navigatorCanvas[0]).framework
+
+
+      onmousedown: (x, y) ->
+        navigatorMouseDown = true
+        console.log 
+        adjustNavigatorSelection(x, y)
       onmouseup: (x, y) ->
-        navigatorSelection.zoom = navigatorCursor.zoom
-        navigatorSelection.x    = (Math.floor(x) - horizontalEdgeAdjustment) / imgResizeFactor
-        navigatorSelection.y    = (Math.floor(y) - verticalEdgeAdjustment) / imgResizeFactor
+        navigatorMouseDown = false
 
       onmousemove: (x, y) ->
         navigatorMouseCoords =
           x : x
           y : y
+        if navigatorMouseDown then adjustNavigatorSelection(x, y)
+
       onrender: (delta, time) ->
 
         # make resizeds show pixel edges
@@ -321,7 +326,7 @@ app.controller 'appCtrl', [
             .drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor)
             .restore()
 
-            if mouseOverNavigator
+            if mouseOverNavigator and not navigatorMouseDown
               navigatorCursorWidth  = selectorCanvas.width() * navigatorCursor.zoom
               navigatorCursorHeight = selectorCanvas.height() * navigatorCursor.zoom
               navigatorCursor.x      = navigatorMouseCoords.x - navigatorCursorWidth / 2
@@ -364,35 +369,47 @@ app.controller 'appCtrl', [
     ###
     SELECTOR FRAMEWORK
     ###
+    selectorBtnCache = ''
+    adjustSelectorSelection = (x, y, btn) ->
+      if btn? then selectorBtnCache = btn
+      btn = selectorBtnCache
+      # adjust selected frame coordinates
+      s = scope.getSelected()
+      if s
+        imgX = (navigatorSelection.x * imgResizeFactor - navigatorSelectionWidth / 2) / navigatorSelection.zoom
+        imgY = (navigatorSelection.y * imgResizeFactor - navigatorSelectionHeight / 2) / navigatorSelection.zoom
+        x = Math.floor((x + imgX) / imgResizeFactor * navigatorSelection.zoom)
+        y = Math.floor((y + imgY) / imgResizeFactor * navigatorSelection.zoom)
+        # left mouse button, set top left frame pos
+        if btn is 0
+          scope.$apply ->
+            # adjust bottom right point
+            if s[0]? and s[1]? and s[2]? and s[3]?
+              s[2] = (s[0] + s[2]) - x
+              s[3] = (s[1] + s[3]) - y
+            s[0] = x
+            s[1] = y
+        # right or middle mouse button, set bottom right frame pos
+        if btn in [1,2]
+          scope.$apply ->
+            if s[0]? and s[1]?
+              s[2] = x - s[0]
+              s[3] = y - s[1]
+
     selectorCq = cq(selectorCanvas[0]).framework
       onmousemove: (x, y) ->
         selectorMouseCoords =
           x: x
           y: y
+        if navigatorMouseDown then adjustSelectorSelection(x, y)
 
-      onmousedown: (x, y, btn)->
-        # adjust selected frame coordinates
-        s = scope.getSelected()
-        if s
-          imgX = (navigatorSelection.x * imgResizeFactor - navigatorSelectionWidth / 2) / navigatorSelection.zoom
-          imgY = (navigatorSelection.y * imgResizeFactor - navigatorSelectionHeight / 2) / navigatorSelection.zoom
-          x = Math.floor((x + imgX) / imgResizeFactor * navigatorSelection.zoom)
-          y = Math.floor((y + imgY) / imgResizeFactor * navigatorSelection.zoom)
-          # left mouse button, set top left frame pos
-          if btn is 0
-            scope.$apply ->
-              # adjust bottom right point
-              if s[0]? and s[1]? and s[2]? and s[3]?
-                s[2] = (s[0] + s[2]) - x
-                s[3] = (s[1] + s[3]) - y
-              s[0] = x
-              s[1] = y
-          # right or middle mouse button, set bottom right frame pos
-          if btn in [1,2]
-            scope.$apply ->
-              if s[0]? and s[1]?
-                s[2] = x - s[0]
-                s[3] = y - s[1]
+      onmousedown: (x, y, btn) ->
+        navigatorMouseDown = true
+        adjustSelectorSelection(x, y, btn)
+      onmouseup: (x, y) ->
+        navigatorMouseDown = false
+
+
 
       onrender: (delta, time) ->
         # make resizeds show pixel edges

@@ -15,7 +15,9 @@ navigatorCursor = {}
 navigatorSelection = {}
 mouseOverNavigator = false
 navigatorMouseCoords = {}
+navigatorMouseDown = false
 selectorMouseCoords = {}
+selectorMouseDown = false
 img = new Image()
 
 navigatorCanvas = $('canvas#navigator')

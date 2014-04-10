@@ -5,7 +5,7 @@ GLOBAL UTIL
  */
 
 (function() {
-  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fakeImageData, fileSelect, imagedata, img, imgResizeFactor, jsonoutput, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, tileImg, tileSource, window_, zoomSpeed;
+  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fakeImageData, fileSelect, imagedata, img, imgResizeFactor, jsonoutput, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorMouseDown, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, selectorMouseDown, tileImg, tileSource, window_, zoomSpeed;
 
   PNGCanvas = cq();
 
@@ -58,7 +58,11 @@ GLOBAL UTIL
 
   navigatorMouseCoords = {};
 
+  navigatorMouseDown = false;
+
   selectorMouseCoords = {};
+
+  selectorMouseDown = false;
 
   img = new Image();
 
@@ -118,7 +122,7 @@ GLOBAL UTIL
       /*
       INIT
        */
-      var horizontalEdgeAdjustment, navigatorCq, navigatorSelectionHeight, navigatorSelectionWidth, save, selectorCq, spritesheetID, verticalEdgeAdjustment;
+      var adjustNavigatorSelection, adjustSelectorSelection, horizontalEdgeAdjustment, navigatorCq, navigatorSelectionHeight, navigatorSelectionWidth, save, selectorBtnCache, selectorCq, spritesheetID, verticalEdgeAdjustment;
       if ((typeof localStorage !== "undefined" && localStorage !== null) && !localStorage.spritesheets) {
         localStorage.spritesheets = '{}';
       }
@@ -209,7 +213,9 @@ GLOBAL UTIL
         ];
       });
       $(window).on('blur', function() {
-        return mouseOverNavigator = false;
+        mouseOverNavigator = false;
+        navigatorMouseDown = false;
+        return selectorMouseDown = false;
       });
       $('body').on('focus', '.click-select', function(e) {
         return $timeout(function() {
@@ -227,33 +233,15 @@ GLOBAL UTIL
       });
       navigatorCanvas.on('mousewheel', function(e) {
         e.preventDefault();
-        if (e.deltaY) {
-          navigatorCursor.zoom += zoomSpeed * (e.deltaY < 1 ? 1 : -1);
-          if (navigatorCursor.zoom < 0.1) {
-            navigatorCursor.zoom = 0.1;
-          }
-          if (navigatorCursor.zoom > 1) {
-            return navigatorCursor.zoom = 1;
-          }
-        }
-      });
-      selectorCanvas.on('mousewheel', function(e) {
-        var zoomCache;
-        e.preventDefault();
-        if (e.deltaY && (navigatorSelection.x != null) && (navigatorSelection.y != null)) {
-          zoomCache = navigatorSelection.zoom;
-          navigatorCursor.zoom = navigatorSelection.zoom += zoomSpeed * (e.deltaY < 1 ? 1 : -1);
-          if (navigatorSelection.zoom < 0.1) {
-            navigatorSelection.zoom = 0.1;
-          }
-          if (navigatorSelection.zoom > 1) {
-            navigatorSelection.zoom = 1;
-          }
-          if (navigatorCursor.zoom < 0.1) {
-            navigatorCursor.zoom = 0.1;
-          }
-          if (navigatorCursor.zoom > 1) {
-            return navigatorCursor.zoom = 1;
+        if (!navigatorMouseDown) {
+          if (e.deltaY) {
+            navigatorCursor.zoom += zoomSpeed * (e.deltaY < 1 ? 1 : -1);
+            if (navigatorCursor.zoom < 0.1) {
+              navigatorCursor.zoom = 0.1;
+            }
+            if (navigatorCursor.zoom > 1) {
+              return navigatorCursor.zoom = 1;
+            }
           }
         }
       });
@@ -434,21 +422,32 @@ GLOBAL UTIL
       /*
       IMAGE NAVIGATOR FRAMEWORK
        */
+      adjustNavigatorSelection = function(x, y) {
+        navigatorSelection.zoom = navigatorCursor.zoom;
+        navigatorSelection.x = (Math.floor(x) - horizontalEdgeAdjustment) / imgResizeFactor;
+        return navigatorSelection.y = (Math.floor(y) - verticalEdgeAdjustment) / imgResizeFactor;
+      };
       horizontalEdgeAdjustment = 0;
       verticalEdgeAdjustment = 0;
       navigatorSelectionWidth = 0;
       navigatorSelectionHeight = 0;
       navigatorCq = cq(navigatorCanvas[0]).framework({
+        onmousedown: function(x, y) {
+          navigatorMouseDown = true;
+          console.log;
+          return adjustNavigatorSelection(x, y);
+        },
         onmouseup: function(x, y) {
-          navigatorSelection.zoom = navigatorCursor.zoom;
-          navigatorSelection.x = (Math.floor(x) - horizontalEdgeAdjustment) / imgResizeFactor;
-          return navigatorSelection.y = (Math.floor(y) - verticalEdgeAdjustment) / imgResizeFactor;
+          return navigatorMouseDown = false;
         },
         onmousemove: function(x, y) {
-          return navigatorMouseCoords = {
+          navigatorMouseCoords = {
             x: x,
             y: y
           };
+          if (navigatorMouseDown) {
+            return adjustNavigatorSelection(x, y);
+          }
         },
         onrender: function(delta, time) {
           var navigatorCursorHeight, navigatorCursorWidth;
@@ -463,7 +462,7 @@ GLOBAL UTIL
               navigatorSelectionHeight = selectorCanvas.height() * navigatorSelection.zoom;
               imgResizeFactor = Math.min(this.canvas.height / img.height, this.canvas.width / img.width);
               this.save().translate(horizontalEdgeAdjustment, verticalEdgeAdjustment).drawImage(img, 0, 0, img.width * imgResizeFactor, img.height * imgResizeFactor).restore();
-              if (mouseOverNavigator) {
+              if (mouseOverNavigator && !navigatorMouseDown) {
                 navigatorCursorWidth = selectorCanvas.width() * navigatorCursor.zoom;
                 navigatorCursorHeight = selectorCanvas.height() * navigatorCursor.zoom;
                 navigatorCursor.x = navigatorMouseCoords.x - navigatorCursorWidth / 2;
@@ -481,40 +480,55 @@ GLOBAL UTIL
       /*
       SELECTOR FRAMEWORK
        */
+      selectorBtnCache = '';
+      adjustSelectorSelection = function(x, y, btn) {
+        var imgX, imgY, s;
+        if (btn != null) {
+          selectorBtnCache = btn;
+        }
+        btn = selectorBtnCache;
+        s = scope.getSelected();
+        if (s) {
+          imgX = (navigatorSelection.x * imgResizeFactor - navigatorSelectionWidth / 2) / navigatorSelection.zoom;
+          imgY = (navigatorSelection.y * imgResizeFactor - navigatorSelectionHeight / 2) / navigatorSelection.zoom;
+          x = Math.floor((x + imgX) / imgResizeFactor * navigatorSelection.zoom);
+          y = Math.floor((y + imgY) / imgResizeFactor * navigatorSelection.zoom);
+          if (btn === 0) {
+            scope.$apply(function() {
+              if ((s[0] != null) && (s[1] != null) && (s[2] != null) && (s[3] != null)) {
+                s[2] = (s[0] + s[2]) - x;
+                s[3] = (s[1] + s[3]) - y;
+              }
+              s[0] = x;
+              return s[1] = y;
+            });
+          }
+          if (btn === 1 || btn === 2) {
+            return scope.$apply(function() {
+              if ((s[0] != null) && (s[1] != null)) {
+                s[2] = x - s[0];
+                return s[3] = y - s[1];
+              }
+            });
+          }
+        }
+      };
       selectorCq = cq(selectorCanvas[0]).framework({
         onmousemove: function(x, y) {
-          return selectorMouseCoords = {
+          selectorMouseCoords = {
             x: x,
             y: y
           };
+          if (navigatorMouseDown) {
+            return adjustSelectorSelection(x, y);
+          }
         },
         onmousedown: function(x, y, btn) {
-          var imgX, imgY, s;
-          s = scope.getSelected();
-          if (s) {
-            imgX = (navigatorSelection.x * imgResizeFactor - navigatorSelectionWidth / 2) / navigatorSelection.zoom;
-            imgY = (navigatorSelection.y * imgResizeFactor - navigatorSelectionHeight / 2) / navigatorSelection.zoom;
-            x = Math.floor((x + imgX) / imgResizeFactor * navigatorSelection.zoom);
-            y = Math.floor((y + imgY) / imgResizeFactor * navigatorSelection.zoom);
-            if (btn === 0) {
-              scope.$apply(function() {
-                if ((s[0] != null) && (s[1] != null) && (s[2] != null) && (s[3] != null)) {
-                  s[2] = (s[0] + s[2]) - x;
-                  s[3] = (s[1] + s[3]) - y;
-                }
-                s[0] = x;
-                return s[1] = y;
-              });
-            }
-            if (btn === 1 || btn === 2) {
-              return scope.$apply(function() {
-                if ((s[0] != null) && (s[1] != null)) {
-                  s[2] = x - s[0];
-                  return s[3] = y - s[1];
-                }
-              });
-            }
-          }
+          navigatorMouseDown = true;
+          return adjustSelectorSelection(x, y, btn);
+        },
+        onmouseup: function(x, y) {
+          return navigatorMouseDown = false;
         },
         onrender: function(delta, time) {
           var action, actionIndex, drawX, drawY, frame, frameColor, frameIndex, frmHeight, frmWidth, frmX, frmY, selected, sprite, spriteIndex, _ref, _results;
