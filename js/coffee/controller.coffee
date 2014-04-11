@@ -18,7 +18,7 @@ app.controller 'appCtrl', [
     selectorCanvas[0].height = 250
 
     reset()
-    scope.spritesheetID = new Date().getTime()#undefined #DEV
+    scope.spritesheetID = undefined
     scope.sprites = []
 
     scope.options =
@@ -122,6 +122,7 @@ app.controller 'appCtrl', [
     fileSelect.on 'change', (e) ->
       loadNewSpritesheet e.target.files[0]
 
+
     ###
     UTIL
     ###
@@ -140,37 +141,17 @@ app.controller 'appCtrl', [
       true
 
     loadNewSpritesheet = (selectedFile) ->
-      reader = new FileReader()
-      reader.onload = (e) ->
-        scope.$apply ->
-          scope.imagedata = e.target.result
-          if fileLoadType is 'new'
-            reset()
-            scope.spritesheetID = new Date().getTime()
-            scope.sprites = []
-            #DEV
-            # scope.infoOpen = true
-            # scope.sprites = [
-            #   {
-            #     name    : 'roboto'
-            #     $sb_currentAction : 0
-            #     $sb_currentFrame : 0
-            #     actions : [
-            #       {
-            #         name             : 'walk_up'
-            #         $sb_currentFrame : 0
-            #         frames           : [
-            #           [1,30, 6,26]
-            #           [1,59, 6,26]
-            #           [1,88, 6,26]
-            #           [1,117, 6,26]
-            #         ]
-            #       }
-            #     ]
-            #   }
-            # ]
-
+      if selectedFile?
+        reader = new FileReader()
+        reader.onload = (e) ->
+          scope.$apply ->
+            scope.imagedata = e.target.result
+            if fileLoadType is 'new'
+              reset()
+              scope.spritesheetID = new Date().getTime()
+              scope.sprites = []
       reader.readAsDataURL selectedFile
+
     # scroll to element in list
     scrollToListElement = (spriteIndex, actionIndex, frameIndex) ->
       scrollTop = listElement.scrollTop()
@@ -201,8 +182,7 @@ app.controller 'appCtrl', [
       s.sprite is sprite and s.action is action and s.frame is frame
 
     scope.getFrameImage = (dimensions, width, height) ->
-      result = getPixelData 'png', img, dimensions, width, height
-      result
+      getPixelData 'png', img, dimensions, width, height
 
     scope.addSprite = ->
       if scope.imagedata
@@ -299,7 +279,7 @@ app.controller 'appCtrl', [
         scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
         scope.save = ->
           $.extend scope.$parent.$parent.options, scope.optionsCache
-          scope.$parent.$parent.$parent.optionsOpen = false
+          scope.$parent.$parent.$parent.modalTemplate = false
     ]
     scope.infoModalCtrl = [
       '$scope'
@@ -327,7 +307,9 @@ app.controller 'appCtrl', [
           parentScope.imagedata     = sheet.image
           parentScope.sprites       = sheet.sprites
           parentScope.options       = sheet.options
-          parentScope.loadOpen      = false
+          parentScope.modalTemplate      = false
+          # make sure reloading doesn't load in the previous spritesheet
+          fileSelect[0].value = ''
     ]
 
     ###
@@ -557,13 +539,6 @@ app.controller 'appCtrl', [
                             if frame[2]? and frame[3]?
                               @fillStyle('#24ffae')
                               @fillRect(frmX+frmWidth-2,frmY+frmHeight-2, 4,4)
-
-
-
-
-
-    #DEV
-    # scope.imagedata = fakeImageData
 
 
 ]

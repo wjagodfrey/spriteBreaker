@@ -1,8 +1,8 @@
-.modal.ng-cloak(ng-if='optionsOpen' ng-controller='outputOptionsCtrl')#options_modal
-  .modal-dialog
+.modal.ng-cloak(ng-controller='outputOptionsCtrl')#options_modal
+  .modal-dialog(ng-click='$event.stopPropagation()')
     .modal-content
       .modal-header
-        button.close(type='button' ng-click='$parent.$parent.$parent.optionsOpen = false') ×
+        button.close(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') ×
         h2.modal-title Settings
       .modal-body
         .form
@@ -51,5 +51,5 @@
               code {"data":{"0":255,"1":255,"2"...
 
       .modal-footer
-        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.optionsOpen = false') Close
+        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') Close
         button.btn.btn-primary(type='button' ng-click='save()') Apply

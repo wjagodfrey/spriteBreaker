@@ -6,7 +6,7 @@ html(ng-app="app" ng-controller="appCtrl")
     title SpriteBreaker - Wilfred James Godfrey
     link(rel="stylesheet" type="text/css" href="./css/index.css")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
-  body(ng-class="{'modal-open':optionsOpen || infoOpen || loadOpen}")
+  body(ng-class="{'modal-open': modalTemplate}")
 
     //- offscreen elements
     .offscreen_hide
@@ -45,13 +45,13 @@ html(ng-app="app" ng-controller="appCtrl")
                   .btn-group(style='margin:0 2px')
                     button(type='button' ng-click='save()' ng-disabled='!imagedata' title='Save').btn.btn-sm.btn-primary
                       span.glyphicon.glyphicon-floppy-disk
-                    button(type='button' ng-click='loadOpen = true' title='Load').btn.btn-sm.btn-primary
+                    button(type='button' ng-click='modalTemplate = "./includes/load_modal.html"' title='Load').btn.btn-sm.btn-primary
                       span.glyphicon.glyphicon-open
 
                   .btn-group(style='margin:0 2px')
-                    button(type='button' ng-click='infoOpen = true' title='Info').btn.btn-sm.btn-info
+                    button(type='button' ng-click='modalTemplate = "./includes/info_modal.html"' title='Info').btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-question-sign
-                    button(type='button' ng-click='optionsOpen = true' ng-disabled='!imagedata' title='Settings').btn.btn-sm.btn-info
+                    button(type='button' ng-click='modalTemplate = "./includes/options_modal.html"' ng-disabled='!imagedata' title='Settings').btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-cog
 
         //- right col
@@ -103,16 +103,10 @@ html(ng-app="app" ng-controller="appCtrl")
 
 
     .modal-backdrop(
-      ng-if='optionsOpen || infoOpen || loadOpen'
-      ng-click='$parent.$parent.optionsOpen = false; $parent.$parent.infoOpen = false; $parent.loadOpen = false;')
+      ng-if='modalTemplate'
+      ng-click='')
     //- output options modal
-    span(ng-include='"./includes/options_modal.html"')
-
-    //- info modal
-    span(ng-include='"./includes/info_modal.html"')
-
-    //- load modal
-    span(ng-include='"./includes/load_modal.html"')
+    span(ng-if='modalTemplate' ng-include='modalTemplate' ng-click='$parent.$parent.modalTemplate = false')
 
 
 

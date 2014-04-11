@@ -1,9 +1,9 @@
-.modal.ng-cloak(ng-if='infoOpen' ng-controller='infoModalCtrl')#info_modal
-  .modal-dialog
+.modal.ng-cloak(ng-controller='infoModalCtrl')#info_modal
+  .modal-dialog(ng-click='$event.stopPropagation()')
     .modal-content
       //- .modal-header
       .modal-body
-        button.close(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') ×
+        button.close(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') ×
         h3 About
         | SpriteBreaker is an open source browser based sprite management tool build by 
         a(href="" style="white-space:nowrap") Wilfred Godfrey
@@ -24,9 +24,9 @@
           li Add and name a new action 
             code eg "stand"
 
-          li Add a new frame ( 
+          li Add a new frame (shortcut: 
             kbd f
-            |  on the keyboard)
+            |  )
 
           li Set your view area
             ul
@@ -37,7 +37,7 @@
               li Left click/drag on the large canvas to set the top left frame coordinates
               li Right click/drag on the large canvas to set the bottom right frame coordinates
           
-          li Save your spritesheet, options and list with the 
+          li Save your work with the 
             span.glyphicon.glyphicon-floppy-disk
             | &nbsp;Save button
 
@@ -48,7 +48,7 @@
         hr
         h4 Good to know
         ul
-          li You can change the output fomat in the options dialog (the 
+          li Change the JSON output fomat in the options dialog (the 
             span.glyphicon.glyphicon-cog
             |  button)
 
@@ -58,11 +58,11 @@
 
           li Update your current spritesheet with the 
             span.glyphicon.glyphicon-repeat
-            | &nbsp;Update button. You'll need to select this again every time you start the application (Browser security reasons).
+            | &nbsp;Update button. For browser security reasons you'll need to point the app to your spritesheet at least once each time you start the application, but don't worry. It's easy.
         hr
         .alert.alert-info
-          | Because SpriteBreaker makes use of the latest web standards, people using older browsers may run into problems. Then again, not sure why anyone with a crappy browser would even be interested in this.
+          | Because SpriteBreaker makes use of the latest web standards, people using older browsers may run into problems. Then again, I'm not really sure why anyone with an outdated browser would be using this.
 
 
       .modal-footer
-        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') Close
+        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') Close

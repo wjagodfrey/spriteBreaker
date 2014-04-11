@@ -108,7 +108,7 @@ list_caret.open::before,
 #list_wrapper button[type=button] {
   float: right;
   margin: 1.5px;
-  margin-top: 6px;
+  margin-top: 15px;
 }
 #list_wrapper input[type=text] {
   width: 110px;

@@ -129,7 +129,7 @@ GLOBAL UTIL
       selectorCanvas[0].width = selectorCanvas.parent().width();
       selectorCanvas[0].height = 250;
       reset();
-      scope.spritesheetID = new Date().getTime();
+      scope.spritesheetID = void 0;
       scope.sprites = [];
       scope.options = {
         output: {
@@ -257,17 +257,19 @@ GLOBAL UTIL
       };
       loadNewSpritesheet = function(selectedFile) {
         var reader;
-        reader = new FileReader();
-        reader.onload = function(e) {
-          return scope.$apply(function() {
-            scope.imagedata = e.target.result;
-            if (fileLoadType === 'new') {
-              reset();
-              scope.spritesheetID = new Date().getTime();
-              return scope.sprites = [];
-            }
-          });
-        };
+        if (selectedFile != null) {
+          reader = new FileReader();
+          reader.onload = function(e) {
+            return scope.$apply(function() {
+              scope.imagedata = e.target.result;
+              if (fileLoadType === 'new') {
+                reset();
+                scope.spritesheetID = new Date().getTime();
+                return scope.sprites = [];
+              }
+            });
+          };
+        }
         return reader.readAsDataURL(selectedFile);
       };
       scrollToListElement = function(spriteIndex, actionIndex, frameIndex) {
@@ -308,9 +310,7 @@ GLOBAL UTIL
         return s.sprite === sprite && s.action === action && s.frame === frame;
       };
       scope.getFrameImage = function(dimensions, width, height) {
-        var result;
-        result = getPixelData('png', img, dimensions, width, height);
-        return result;
+        return getPixelData('png', img, dimensions, width, height);
       };
       scope.addSprite = function() {
         if (scope.imagedata) {
@@ -440,7 +440,7 @@ GLOBAL UTIL
           scope.optionsCache = $.extend(true, {}, scope.$parent.$parent.options);
           return scope.save = function() {
             $.extend(scope.$parent.$parent.options, scope.optionsCache);
-            return scope.$parent.$parent.$parent.optionsOpen = false;
+            return scope.$parent.$parent.$parent.modalTemplate = false;
           };
         }
       ];
@@ -480,7 +480,8 @@ GLOBAL UTIL
             parentScope.imagedata = sheet.image;
             parentScope.sprites = sheet.sprites;
             parentScope.options = sheet.options;
-            return parentScope.loadOpen = false;
+            parentScope.modalTemplate = false;
+            return fileSelect[0].value = '';
           };
         }
       ];

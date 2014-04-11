@@ -1,15 +1,13 @@
-.modal.ng-cloak(ng-if='loadOpen' ng-controller='loadModalCtrl')#load_modal
-  .modal-dialog
+.modal.ng-cloak(ng-controller='loadModalCtrl')#load_modal
+  .modal-dialog(ng-click='$event.stopPropagation()')
     .modal-content
       .modal-header
-        button.close(type='button' ng-click='$parent.$parent.$parent.loadOpen = false') ×
+        button.close(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') ×
         h3.modal-title Load
       .modal-body
         div(ng-if="noSheets").alert.alert-info There are no saves
         .spritesheet(
           ng-repeat='(id, spritesheet) in spritesheets'
-          ng-click='$parent.selected = spritesheet.id'
-          ng-class='{selected: $parent.selected == spritesheet.id}'
         )
           img(ng-src='{{spritesheet.image}}').img-thumbnail
           .sprites
@@ -21,6 +19,7 @@
               ng-click='removeConfirmation = true'
             ).btn.btn-xs.btn-danger
               span.glyphicon.glyphicon-trash
+            button.btn.btn-xs.btn-info(type='button' ng-click='load(spritesheet.id)') Load
           .button_wrapper(ng-show='removeConfirmation')
             button(
               type='button'
@@ -29,11 +28,10 @@
               span.glyphicon.glyphicon-remove
             button(
               type='button'
-              ng-click='delete(selected)'
+              ng-click='delete(spritesheet.id)'
             ).btn.btn-xs.btn-success
               span.glyphicon.glyphicon-ok
 
 
       .modal-footer
-        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.loadOpen = false') Close
-        button.btn.btn-primary(type='button' ng-click='load(selected)' ng-disabled="false") Load
+        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') Close
