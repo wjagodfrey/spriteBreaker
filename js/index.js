@@ -417,7 +417,12 @@ GLOBAL UTIL
         }
       };
       scope.removeFrame = function(spriteIndex, actionIndex, frameIndex) {
-        return scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1);
+        scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1);
+        if (frameIndex === scope.selectedFrame.frame) {
+          return scope.selectedFrame.frame = -1;
+        } else if (frameIndex < scope.selectedFrame.frame) {
+          return scope.selectedFrame.frame--;
+        }
       };
       save = scope.save = function() {
         var localSpritesheets, spritesheet;

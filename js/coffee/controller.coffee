@@ -265,6 +265,13 @@ app.controller 'appCtrl', [
             scrollToListElement spriteIndex, actionIndex, frameIndex
     scope.removeFrame = (spriteIndex, actionIndex, frameIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1)
+      if frameIndex is scope.selectedFrame.frame
+        scope.selectedFrame.frame = -1
+      else if frameIndex < scope.selectedFrame.frame
+        scope.selectedFrame.frame--
+      # if frameIndex is scope.sprites[spriteIndex].actions[actionIndex].frames.length
+      #   scope.selectedFrame.frame--
+      #   if scope.selectedFrame.frame < 0 then scope.selectedFrame.frame = 0
 
     save = scope.save = ->
       if localStorage?
