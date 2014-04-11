@@ -51,7 +51,7 @@ html(ng-app="app" ng-controller="appCtrl")
                   .btn-group(style='margin:0 2px')
                     button(type='button' ng-click='infoOpen = true' title='Info').btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-question-sign
-                    button(type='button' ng-click='optionsOpen = true' title='Settings').btn.btn-sm.btn-info
+                    button(type='button' ng-click='optionsOpen = true' ng-disabled='!imagedata' title='Settings').btn.btn-sm.btn-info
                       span.glyphicon.glyphicon-cog
 
         //- right col
@@ -97,7 +97,7 @@ html(ng-app="app" ng-controller="appCtrl")
                     .button_wrapper
                       button(type='button' ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
 
-          button(type='button' ng-click='addSprite()').btn.btn-info#add_sprite
+          button(type='button' ng-disabled='!imagedata' ng-click='addSprite()').btn.btn-info#add_sprite
             .span.glyphicon.glyphicon-plus-sign
             | &nbsp; sprite
 
