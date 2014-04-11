@@ -17,6 +17,12 @@ canvas {
 input[type=file] {
   width: 100%;
 }
+.offscreen_hide {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  top: -100000px;
+}
 .input-group {
   padding-top: 10px;
 }
@@ -38,7 +44,7 @@ input[type=file] {
 }
 #output {
   resize: none;
-  height: 65px;
+  height: 165px;
 }
 list_item,
 #list_wrapper .sprite_header,
@@ -75,7 +81,7 @@ list_caret.open::before,
 }
 #list_wrapper {
   margin-left: 0;
-  height: 460px;
+  height: 457px;
   border: 1px solid #928e86;
   border-radius: 4px;
   padding-left: 0;

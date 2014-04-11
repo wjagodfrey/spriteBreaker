@@ -5,29 +5,62 @@
       .modal-body
         button.close(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') ×
         h3 About
-        | SpriteBreaker is an open source web based sprite management tool build by 
+        | SpriteBreaker is an open source browser based sprite management tool build by 
         a(href="" style="white-space:nowrap") Wilfred Godfrey
-        |. SpriteBreaker aims to make managing and updating spritesheets as simple as possible.
+        |. SpriteBreaker aims to make managing and updating spritesheets as easy as possible.
 
+        
+        hr
         h4 Quick start guide
         ol
-          li Load an image using the file selector
+
+          li Load a fresh spritesheet using the 
+            span.glyphicon.glyphicon-folder-open
+            |  &nbsp;New button
+
           li Add and name a new sprite 
             code eg "mario"
+
           li Add and name a new action 
             code eg "stand"
+
+          li Set your view area
+            ul
+              li Scroll and click/drag on the small canvas to set the view area
+
           li Add a new frame
+
           li Set frame coordinates
-          li Repeat
+            ul
+              li Left click/drag on the large canvas to set the top left frame coordinate
+              li Right click/drag on the large canvas to set the bottom right frame coordinate
+          
+          li Save your spritesheet with the 
+            span.glyphicon.glyphicon-floppy-disk
+            | &nbsp;Save button
+
+          li Copy the resulting JSON from the  
+            span.glyphicon.glyphicon-circle-arrow-down
+            | &nbsp;Output area
+
+        hr
+        h4 Advanced
         ul
-          li Scroll and click on the small canvas to set the view area
-          li Left click on the large canvas to set the top left frame coordinate
-          li Right click on the large canvas to set the bottom right frame coordinate
-          li Scroll on the large canvas to zoom in and out
-        ul
-          li You can save and load using the buttons at the bottom middle.
           li You can change the output fomat in the options dialog (the 
-          span.glyphicon.glyphicon-cog
-          |  button)
+            span.glyphicon.glyphicon-cog
+            |  button)
+
+          li Load and delete saved spritesheets with the 
+            span.glyphicon.glyphicon-open
+            | &nbsp;Load dialog
+
+          li Update your current spritesheet if it has changed on disk with the 
+            span.glyphicon.glyphicon-repeat
+            | &nbsp;Update button
+        hr
+        .alert.alert-info
+          | Because SpriteBreaker makes use of the latest web standards, people using older browsers may run into problems. Then again, not sure why anyone with a crappy browser would even be interested in this.
+
+
       .modal-footer
         button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.infoOpen = false') Close

@@ -8,6 +8,10 @@ html(ng-app="app" ng-controller="appCtrl")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
   body(ng-class="{'modal-open':optionsOpen || infoOpen || loadOpen}")
 
+    //- offscreen elements
+    .offscreen_hide
+      input(type='file', accept='image/*')#newfilepath
+      input(type='file', accept='image/*')#updatefilepath
     //- wrapper
     .container.ng-cloak
       .row
@@ -23,33 +27,33 @@ html(ng-app="app" ng-controller="appCtrl")
             .col-xs-6#navigator_wrapper
               canvas#navigator
             //- bottom left navigator
-            .col-xs-6
+            .col-xs-6(style='padding:0 5px')
               form#form
-                .input-group
-                  .input-group-addon
-                    span.glyphicon.glyphicon-folder-open
-                  input(type='file', accept='image/*').form-control#filepath
-
-                .input-group
-                  .input-group-addon
-                    span.glyphicon.glyphicon-picture
-                  input(type='text' ng-model='imagedata').form-control.click-select#imagedata
 
                 //- label output
-                .input-group
+                .input-group(style='padding-top:0')
                   .input-group-addon
                     span.glyphicon.glyphicon-circle-arrow-down
                   textarea(type='text' ng-model='output').form-control.click-select#output
-                .input-group
-                  .btn-group(style='margin-left:10px')
-                    button(type='button' ng-click="save()").btn.btn-sm.btn-primary Save
-                    button(type='button' ng-click='loadOpen = true').btn.btn-sm.btn-primary Load
-                  .btn-group(style='margin-left:10px')
-                    button(type='button' ng-click='infoOpen = true').btn.btn-sm.btn-info
-                      span.glyphicon.glyphicon-question-sign
-                    button(type='button' ng-click='optionsOpen = true').btn.btn-sm.btn-info
-                      span.glyphicon.glyphicon-cog
+                .input-group(style='padding-top:7px')
 
+                  .btn-group(style='margin:0 2px')
+                    button(type='button' ng-click='newSpritesheet()' title='New spritesheet').btn.btn-sm.btn-primary
+                      span.glyphicon.glyphicon-folder-open
+                    button(type='button' ng-click='updateSpritesheet()' ng-disabled='!imagedata' title='Update spritesheet').btn.btn-sm.btn-primary
+                      span.glyphicon.glyphicon-repeat
+
+                  .btn-group(style='margin:0 2px')
+                    button(type='button' ng-click='save()' ng-disabled='!imagedata' title='Save').btn.btn-sm.btn-primary
+                      span.glyphicon.glyphicon-floppy-disk
+                    button(type='button' ng-click='loadOpen = true' title='Load').btn.btn-sm.btn-primary
+                      span.glyphicon.glyphicon-open
+
+                  .btn-group(style='margin:0 2px')
+                    button(type='button' ng-click='infoOpen = true' title='Info').btn.btn-sm.btn-info
+                      span.glyphicon.glyphicon-question-sign
+                    button(type='button' ng-click='optionsOpen = true' title='Settings').btn.btn-sm.btn-info
+                      span.glyphicon.glyphicon-cog
 
         //- right col
         .col-xs-5#list_wrapper
@@ -90,7 +94,7 @@ html(ng-app="app" ng-controller="appCtrl")
 
                   .frame_header(
                     ng-click='setSelected(spriteIndex,actionIndex,frameIndex)'
-                    ng-class='{selected:isSelected(spriteIndex,actionIndex,frameIndex)}'
+                    ng-class='{selected:isSelected(spriteIndex, actionIndex, frameIndex)}'
                   )
                     img(ng-src='{{getFrameImage(frameData, 50, 50)}}')
                     .button_wrapper

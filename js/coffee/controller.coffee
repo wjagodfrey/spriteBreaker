@@ -17,7 +17,7 @@ app.controller 'appCtrl', [
     selectorCanvas[0].width = selectorCanvas.parent().width()
     selectorCanvas[0].height = 250
 
-    spritesheetID = undefined
+    scope.spritesheetID = undefined
 
     scope.options =
       output:
@@ -81,10 +81,10 @@ app.controller 'appCtrl', [
     , true
 
     # watch imagedata input for new imagedata
-    scope.$watch 'imagedata', (imgData) ->
+    scope.$watch 'imagedata', (imagedata) ->
       reset()
       scope.sprites = []
-      img.src = imgData
+      img.src = imagedata
       #DEV
       # scope.infoOpen = true
       scope.sprites = [
@@ -135,13 +135,19 @@ app.controller 'appCtrl', [
           navigatorCursor.zoom += zoomSpeed*(if e.deltaY < 1 then 1 else -1)
           if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
           if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
-          # if navigatorMouseDown
-          #   navigatorSelection.zoom = navigatorCursor.zoom
-
-    #     if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
 
     # load new image on file select
-    fileSelect.on 'change', (e) ->
+    newFileSelect.on 'change', (e) ->
+      selectedFile = e.target.files[0]
+      reader = new FileReader()
+      reader.onload = (e) ->
+        scope.$apply ->
+          scope.imagedata = e.target.result
+          scope.spritesheetID = new Date().getTime()
+      reader.readAsDataURL selectedFile
+
+    # load updated image on file select
+    updateFileSelect.on 'change', (e) ->
       selectedFile = e.target.files[0]
       reader = new FileReader()
       reader.onload = (e) ->
@@ -152,6 +158,31 @@ app.controller 'appCtrl', [
     ###
     UTIL
     ###
+
+    # scroll to element in list
+    scrollToListElement = (spriteIndex, actionIndex, frameIndex) ->
+      scrollTop = listElement.scrollTop()
+      element = {}
+      if spriteIndex?
+        element = sprite = $('.sprite').eq(spriteIndex)
+        if !actionIndex? and !frameIndex?
+          scrollTop += sprite.position().top
+        else if actionIndex?
+          element = action = sprite.find('.action').eq(actionIndex)
+          if !frameIndex?
+            scrollTop += action.position().top
+          else if frameIndex?
+            element = frame = action.find('.frame').eq(frameIndex)
+            scrollTop += frame.position().top
+      listElement.scrollTop scrollTop - listElement.height()/2 + element.height()/2
+
+    scope.newSpritesheet = ->
+      $('#newfilepath').click()
+      true
+    scope.updateSpritesheet = ->
+      $('#updatefilepath').click()
+      true
+
     scope.getSelected = ->
       r = scope.selectedFrame
       scope.sprites[r.sprite]?.actions[r.action]?.frames[r.frame]
@@ -162,7 +193,7 @@ app.controller 'appCtrl', [
         frame  : frame
     scope.isSelected = (sprite, action, frame) ->
       s = scope.selectedFrame
-      s.frame is frame and s.action is action and s.frame is frame
+      s.sprite is sprite and s.action is action and s.frame is frame
 
     scope.getFrameImage = (dimensions, width, height) ->
       result = getPixelData 'png', img, dimensions, width, height
@@ -175,9 +206,11 @@ app.controller 'appCtrl', [
           actions : []
         # select new input
         $timeout ->
+          spriteIndex = scope.sprites.length - 1
           $('.sprite_header input')
           .eq(scope.sprites.length - 1)
           .select()
+          scrollToListElement spriteIndex
     scope.removeSprite = (spriteIndex) ->
       scope.sprites.splice(spriteIndex, 1)
 
@@ -197,35 +230,35 @@ app.controller 'appCtrl', [
         $sb_currentFrame : 0
       # select new input
       $timeout ->
+        actionIndex = scope.sprites[spriteIndex].actions.length - 1
         $('.sprite')
         .eq(spriteIndex)
         .find('.action_header input')
-        .eq(scope.sprites[spriteIndex].actions.length - 1)
+        .eq(actionIndex)
         .select()
+        scrollToListElement spriteIndex, actionIndex
     scope.removeAction = (spriteIndex, actionIndex) ->
       scope.sprites[spriteIndex].actions.splice(actionIndex, 1)
 
     scope.addFrame = (spriteIndex,actionIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.push []
-      scope.setSelected spriteIndex, actionIndex, scope.sprites[spriteIndex].actions[actionIndex].frames.length-1
+      frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length-1
+      scope.setSelected spriteIndex, actionIndex, frameIndex
+      $timeout ->
+        scrollToListElement spriteIndex, actionIndex, frameIndex
     scope.removeFrame = (spriteIndex, actionIndex, frameIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1)
 
     save = scope.save = ->
       if localStorage?
-
         localSpritesheets = JSON.parse(localStorage.spritesheets)
-
         spritesheet =
-          id: spritesheetID or spritesheetID = (new Date().getTime())
+          id: scope.spritesheetID
           sprites: scope.sprites
           image: img.src
           options: scope.options
-
         localSpritesheets[spritesheet.id] = spritesheet
-        
         localStorage.spritesheets = JSON.stringify( localSpritesheets )
-
 
     ###
     CONTROLLERS
@@ -236,25 +269,19 @@ app.controller 'appCtrl', [
         scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
         scope.save = ->
           $.extend scope.$parent.$parent.options, scope.optionsCache
-          scope.$parent.$parent.optionsOpen = false
+          scope.$parent.$parent.$parent.optionsOpen = false
     ]
     scope.infoModalCtrl = [
       '$scope'
       (scope) ->
-        scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
-        scope.save = ->
-          $.extend scope.$parent.$parent.options, scope.optionsCache
-          scope.$parent.$parent.optionsOpen = false
     ]
     scope.loadModalCtrl = [
       '$scope'
       (scope) ->
         scope.spritesheets = {}
         if localStorage? then scope.spritesheets = JSON.parse(localStorage.spritesheets)
-
         scope.$watch 'spritesheets', ->
           scope.noSheets = !(for k of scope.spritesheets then do -> return true).length
-          console.log scope.noSheets, scope.spritesheets
         , true
 
         scope.delete = (id) ->
@@ -264,9 +291,9 @@ app.controller 'appCtrl', [
           if scope.selected is id then scope.selected = false
 
         scope.load = (id) ->
-          sheet         = scope.spritesheets[id]
-          spritesheetID = id
-          img.src       = sheet.image
+          sheet                                  = scope.spritesheets[id]
+          scope.$parent.$parent.$parent.spritesheetID                    = id
+          img.src                                = sheet.image
           scope.$parent.$parent.$parent.sprites  = sheet.sprites
           scope.$parent.$parent.$parent.options  = sheet.options
           scope.$parent.$parent.$parent.loadOpen = false
@@ -289,7 +316,6 @@ app.controller 'appCtrl', [
 
       onmousedown: (x, y) ->
         navigatorMouseDown = true
-        console.log 
         adjustNavigatorSelection(x, y)
       onmouseup: (x, y) ->
         navigatorMouseDown = false
