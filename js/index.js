@@ -5,7 +5,7 @@ GLOBAL UTIL
  */
 
 (function() {
-  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fakeImageData, img, imgResizeFactor, jsonoutput, listElement, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorMouseDown, navigatorSelection, newFileSelect, reset, selectorCanvas, selectorMouseCoords, selectorMouseDown, tileImg, tileSource, updateFileSelect, window_, zoomSpeed;
+  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fakeImageData, fileSelect, img, imgResizeFactor, jsonoutput, listElement, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorMouseDown, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, selectorMouseDown, tileImg, tileSource, window_, zoomSpeed;
 
   PNGCanvas = cq();
 
@@ -70,9 +70,7 @@ GLOBAL UTIL
 
   listElement = $('#list');
 
-  newFileSelect = $('#newfilepath');
-
-  updateFileSelect = $('#updatefilepath');
+  fileSelect = $('#filepath');
 
   jsonoutput = $('#output');
 
@@ -122,7 +120,7 @@ GLOBAL UTIL
       /*
       INIT
        */
-      var adjustNavigatorSelection, adjustSelectorSelection, horizontalEdgeAdjustment, navigatorCq, navigatorSelectionHeight, navigatorSelectionWidth, save, scrollToListElement, selectorBtnCache, selectorCq, verticalEdgeAdjustment;
+      var adjustNavigatorSelection, adjustSelectorSelection, fileLoadType, horizontalEdgeAdjustment, loadNewSpritesheet, navigatorCq, navigatorSelectionHeight, navigatorSelectionWidth, save, scrollToListElement, selectorBtnCache, selectorCq, verticalEdgeAdjustment;
       if ((typeof localStorage !== "undefined" && localStorage !== null) && !localStorage.spritesheets) {
         localStorage.spritesheets = '{}';
       }
@@ -130,7 +128,9 @@ GLOBAL UTIL
       navigatorCanvas[0].height = 200;
       selectorCanvas[0].width = selectorCanvas.parent().width();
       selectorCanvas[0].height = 250;
-      scope.spritesheetID = void 0;
+      reset();
+      scope.spritesheetID = new Date().getTime();
+      scope.sprites = [];
       scope.options = {
         output: {
           frame: 'array',
@@ -196,23 +196,7 @@ GLOBAL UTIL
         return scope.output = output.replace(/\'/g, '"');
       }, true);
       scope.$watch('imagedata', function(imagedata) {
-        reset();
-        scope.sprites = [];
-        img.src = imagedata;
-        return scope.sprites = [
-          {
-            name: 'roboto',
-            $sb_currentAction: 0,
-            $sb_currentFrame: 0,
-            actions: [
-              {
-                name: 'walk_up',
-                $sb_currentFrame: 0,
-                frames: [[1, 30, 6, 26], [1, 59, 6, 26], [1, 88, 6, 26], [1, 117, 6, 26]]
-              }
-            ]
-          }
-        ];
+        return img.src = imagedata;
       });
       $(window).on('blur', function() {
         mouseOverNavigator = false;
@@ -247,33 +231,57 @@ GLOBAL UTIL
           }
         }
       });
-      newFileSelect.on('change', function(e) {
-        var reader, selectedFile;
-        selectedFile = e.target.files[0];
-        reader = new FileReader();
-        reader.onload = function(e) {
-          return scope.$apply(function() {
-            scope.imagedata = e.target.result;
-            return scope.spritesheetID = new Date().getTime();
-          });
-        };
-        return reader.readAsDataURL(selectedFile);
-      });
-      updateFileSelect.on('change', function(e) {
-        var reader, selectedFile;
-        selectedFile = e.target.files[0];
-        reader = new FileReader();
-        reader.onload = function(e) {
-          return scope.$apply(function() {
-            return scope.imagedata = e.target.result;
-          });
-        };
-        return reader.readAsDataURL(selectedFile);
+      fileSelect.on('change', function(e) {
+        return loadNewSpritesheet(e.target.files[0]);
       });
 
       /*
       UTIL
        */
+      fileLoadType = 'new';
+      scope.newSpritesheet = function() {
+        fileLoadType = 'new';
+        fileSelect.click();
+        return true;
+      };
+      scope.updateSpritesheet = function() {
+        fileLoadType = 'update';
+        if (!fileSelect[0].files.length) {
+          fileSelect.click();
+        } else {
+          loadNewSpritesheet(fileSelect[0].files[0]);
+        }
+        return true;
+      };
+      loadNewSpritesheet = function(selectedFile) {
+        var reader;
+        reader = new FileReader();
+        reader.onload = function(e) {
+          return scope.$apply(function() {
+            scope.imagedata = e.target.result;
+            if (fileLoadType === 'new') {
+              reset();
+              scope.spritesheetID = new Date().getTime();
+              scope.sprites = [];
+              return scope.sprites = [
+                {
+                  name: 'roboto',
+                  $sb_currentAction: 0,
+                  $sb_currentFrame: 0,
+                  actions: [
+                    {
+                      name: 'walk_up',
+                      $sb_currentFrame: 0,
+                      frames: [[1, 30, 6, 26], [1, 59, 6, 26], [1, 88, 6, 26], [1, 117, 6, 26]]
+                    }
+                  ]
+                }
+              ];
+            }
+          });
+        };
+        return reader.readAsDataURL(selectedFile);
+      };
       scrollToListElement = function(spriteIndex, actionIndex, frameIndex) {
         var action, element, frame, scrollTop, sprite;
         scrollTop = listElement.scrollTop();
@@ -293,14 +301,6 @@ GLOBAL UTIL
           }
         }
         return listElement.scrollTop(scrollTop - listElement.height() / 2 + element.height() / 2);
-      };
-      scope.newSpritesheet = function() {
-        $('#newfilepath').click();
-        return true;
-      };
-      scope.updateSpritesheet = function() {
-        $('#updatefilepath').click();
-        return true;
       };
       scope.getSelected = function() {
         var r, _ref, _ref1;

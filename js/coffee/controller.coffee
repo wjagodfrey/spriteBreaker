@@ -17,7 +17,9 @@ app.controller 'appCtrl', [
     selectorCanvas[0].width = selectorCanvas.parent().width()
     selectorCanvas[0].height = 250
 
-    scope.spritesheetID = undefined
+    reset()
+    scope.spritesheetID = new Date().getTime()#undefined #DEV
+    scope.sprites = []
 
     scope.options =
       output:
@@ -82,30 +84,7 @@ app.controller 'appCtrl', [
 
     # watch imagedata input for new imagedata
     scope.$watch 'imagedata', (imagedata) ->
-      reset()
-      scope.sprites = []
       img.src = imagedata
-      #DEV
-      # scope.infoOpen = true
-      scope.sprites = [
-        {
-          name    : 'roboto'
-          $sb_currentAction : 0
-          $sb_currentFrame : 0
-          actions : [
-            {
-              name             : 'walk_up'
-              $sb_currentFrame : 0
-              frames           : [
-                [1,30, 6,26]
-                [1,59, 6,26]
-                [1,88, 6,26]
-                [1,117, 6,26]
-              ]
-            }
-          ]
-        }
-      ]
 
     # when you leave the window or tab
     $(window).on 'blur', ->
@@ -138,29 +117,59 @@ app.controller 'appCtrl', [
           if navigatorCursor.zoom < 0.1 then navigatorCursor.zoom = 0.1
           if navigatorCursor.zoom > 1 then navigatorCursor.zoom = 1
 
-    # load new image on file select
-    newFileSelect.on 'change', (e) ->
-      selectedFile = e.target.files[0]
-      reader = new FileReader()
-      reader.onload = (e) ->
-        scope.$apply ->
-          scope.imagedata = e.target.result
-          scope.spritesheetID = new Date().getTime()
-      reader.readAsDataURL selectedFile
-
-    # load updated image on file select
-    updateFileSelect.on 'change', (e) ->
-      selectedFile = e.target.files[0]
-      reader = new FileReader()
-      reader.onload = (e) ->
-        scope.$apply ->
-          scope.imagedata = e.target.result
-      reader.readAsDataURL selectedFile
+    # load updated image on file change
+    fileSelect.on 'change', (e) ->
+      loadNewSpritesheet e.target.files[0]
 
     ###
     UTIL
     ###
 
+    fileLoadType = 'new'
+    scope.newSpritesheet = ->
+      fileLoadType = 'new'
+      fileSelect.click()
+      true
+    scope.updateSpritesheet = ->
+      fileLoadType = 'update'
+      if !fileSelect[0].files.length
+        fileSelect.click()
+      else
+        loadNewSpritesheet fileSelect[0].files[0]
+      true
+
+    loadNewSpritesheet = (selectedFile) ->
+      reader = new FileReader()
+      reader.onload = (e) ->
+        scope.$apply ->
+          scope.imagedata = e.target.result
+          if fileLoadType is 'new'
+            reset()
+            scope.spritesheetID = new Date().getTime()
+            scope.sprites = []
+            #DEV
+            # scope.infoOpen = true
+            scope.sprites = [
+              {
+                name    : 'roboto'
+                $sb_currentAction : 0
+                $sb_currentFrame : 0
+                actions : [
+                  {
+                    name             : 'walk_up'
+                    $sb_currentFrame : 0
+                    frames           : [
+                      [1,30, 6,26]
+                      [1,59, 6,26]
+                      [1,88, 6,26]
+                      [1,117, 6,26]
+                    ]
+                  }
+                ]
+              }
+            ]
+
+      reader.readAsDataURL selectedFile
     # scroll to element in list
     scrollToListElement = (spriteIndex, actionIndex, frameIndex) ->
       scrollTop = listElement.scrollTop()
@@ -177,13 +186,6 @@ app.controller 'appCtrl', [
             element = frame = action.find('.frame').eq(frameIndex)
             scrollTop += frame.position().top
       listElement.scrollTop scrollTop - listElement.height()/2 + element.height()/2
-
-    scope.newSpritesheet = ->
-      $('#newfilepath').click()
-      true
-    scope.updateSpritesheet = ->
-      $('#updatefilepath').click()
-      true
 
     scope.getSelected = ->
       r = scope.selectedFrame
@@ -269,9 +271,6 @@ app.controller 'appCtrl', [
         scope.selectedFrame.frame = -1
       else if frameIndex < scope.selectedFrame.frame
         scope.selectedFrame.frame--
-      # if frameIndex is scope.sprites[spriteIndex].actions[actionIndex].frames.length
-      #   scope.selectedFrame.frame--
-      #   if scope.selectedFrame.frame < 0 then scope.selectedFrame.frame = 0
 
     save = scope.save = ->
       if localStorage?

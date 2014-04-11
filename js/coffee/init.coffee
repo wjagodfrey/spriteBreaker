@@ -24,8 +24,7 @@ selectorCanvas = $('canvas#selector')
 
 listElement = $('#list')
 
-newFileSelect = $('#newfilepath')
-updateFileSelect = $('#updatefilepath')
+fileSelect = $('#filepath')
 jsonoutput = $('#output')
 
 
