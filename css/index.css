@@ -140,6 +140,9 @@ list_caret.open::before,
 #list_wrapper .sprite_header.open {
   background: #fd9b1f;
 }
+#list_wrapper .sprite_header img {
+  margin: 5px 10px;
+}
 #list_wrapper .action_header {
   padding-left: 30px;
   background: #feb457;

@@ -202,6 +202,8 @@ GLOBAL UTIL
         return scope.sprites = [
           {
             name: 'roboto',
+            $sb_currentAction: 0,
+            $sb_currentFrame: 0,
             actions: [
               {
                 name: 'walk_up',
@@ -326,7 +328,9 @@ GLOBAL UTIL
         if (scope.imagedata) {
           scope.sprites.push({
             name: 'sprite',
-            actions: []
+            actions: [],
+            $sb_currentAction: 0,
+            $sb_currentFrame: 0
           });
           return $timeout(function() {
             var spriteIndex;
@@ -341,17 +345,34 @@ GLOBAL UTIL
       };
       $interval((function(_this) {
         return function() {
-          var action, sprite, _i, _len, _ref, _results;
+          var action, sprite, _i, _len, _ref, _ref1, _results;
           _ref = scope.sprites;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             sprite = _ref[_i];
+            if (sprite.$sb_currentAction == null) {
+              sprite.$sb_currentAction = 0;
+            }
+            if (sprite.$sb_currentFrame == null) {
+              sprite.$sb_currentFrame = 0;
+            }
+            sprite.$sb_currentFrame++;
+            if (sprite.$sb_currentFrame >= ((_ref1 = sprite.actions[sprite.$sb_currentAction]) != null ? _ref1.frames.length : void 0)) {
+              sprite.$sb_currentFrame = 0;
+              sprite.$sb_currentAction++;
+              if (sprite.$sb_currentAction >= sprite.actions.length) {
+                sprite.$sb_currentAction = 0;
+              }
+            }
             _results.push((function() {
-              var _j, _len1, _ref1, _results1;
-              _ref1 = sprite.actions;
+              var _j, _len1, _ref2, _results1;
+              _ref2 = sprite.actions;
               _results1 = [];
-              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                action = _ref1[_j];
+              for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+                action = _ref2[_j];
+                if (action.$sb_currentFrame == null) {
+                  action.$sb_currentFrame = 0;
+                }
                 action.$sb_currentFrame++;
                 if (action.$sb_currentFrame >= action.frames.length) {
                   _results1.push(action.$sb_currentFrame = 0);

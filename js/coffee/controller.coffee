@@ -90,6 +90,8 @@ app.controller 'appCtrl', [
       scope.sprites = [
         {
           name    : 'roboto'
+          $sb_currentAction : 0
+          $sb_currentFrame : 0
           actions : [
             {
               name             : 'walk_up'
@@ -204,6 +206,8 @@ app.controller 'appCtrl', [
         scope.sprites.push
           name    : 'sprite'
           actions : []
+          $sb_currentAction : 0
+          $sb_currentFrame : 0
         # select new input
         $timeout ->
           spriteIndex = scope.sprites.length - 1
@@ -214,10 +218,21 @@ app.controller 'appCtrl', [
     scope.removeSprite = (spriteIndex) ->
       scope.sprites.splice(spriteIndex, 1)
 
-    # change action animation frame
+    # animate animation previewers
     $interval( =>
+
       for sprite in scope.sprites
+        sprite.$sb_currentAction ?= 0
+        sprite.$sb_currentFrame ?= 0
+        sprite.$sb_currentFrame++
+        if sprite.$sb_currentFrame >= sprite.actions[sprite.$sb_currentAction]?.frames.length
+          sprite.$sb_currentFrame = 0
+          sprite.$sb_currentAction++
+          if sprite.$sb_currentAction >= sprite.actions.length
+            sprite.$sb_currentAction = 0
+
         for action in sprite.actions
+          action.$sb_currentFrame ?= 0
           action.$sb_currentFrame++
           if action.$sb_currentFrame >= action.frames.length
             action.$sb_currentFrame = 0

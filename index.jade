@@ -71,7 +71,7 @@ html(ng-app="app" ng-controller="appCtrl")
                 .button_wrapper
                   button(type='button' ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
                   button(type='button' ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
-
+                img(ng-src='{{getFrameImage(sprite.actions[sprite.$sb_currentAction].frames[sprite.$sb_currentFrame], 50, 50)}}')
               div(
                 ng-repeat='(actionIndex, action) in sprite.actions'
                 ng-show='$parent.open'
