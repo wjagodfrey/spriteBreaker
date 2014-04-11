@@ -63,9 +63,8 @@ html(ng-app="app" ng-controller="appCtrl")
             ).sprite
 
               .sprite_header(
-                ng-init='open = true'
-                ng-click='open = !open'
-                ng-class='{open:open}'
+                ng-click='sprite.$sb_listOpen = !sprite.$sb_listOpen'
+                ng-class='{open:sprite.$sb_listOpen}'
               )
                 input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control.click-select
                 .button_wrapper
@@ -74,13 +73,12 @@ html(ng-app="app" ng-controller="appCtrl")
                 img(ng-src='{{getFrameImage(sprite.actions[sprite.$sb_currentAction].frames[sprite.$sb_currentFrame], 50, 50)}}')
               div(
                 ng-repeat='(actionIndex, action) in sprite.actions'
-                ng-show='$parent.open'
+                ng-show='$parent.sprite.$sb_listOpen'
               ).action
 
                 .action_header(
-                  ng-init='open = true'
-                  ng-click='open = !open'
-                  ng-class='{open:open}'
+                  ng-click='action.$sb_listOpen = !action.$sb_listOpen'
+                  ng-class='{open:action.$sb_listOpen}'
                 )
                   input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control.click-select
                   img(ng-src='{{getFrameImage(action.frames[action.$sb_currentFrame], 50, 50)}}')
@@ -89,7 +87,7 @@ html(ng-app="app" ng-controller="appCtrl")
                     button(type='button' ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
                 div(
                   ng-repeat="(frameIndex, frameData) in action.frames"
-                  ng-show='$parent.open'
+                  ng-show='$parent.action.$sb_listOpen'
                 ).frame
 
                   .frame_header(
