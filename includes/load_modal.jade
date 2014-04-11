@@ -7,7 +7,7 @@
       .modal-body
         div(ng-if="noSheets").alert.alert-info There are no saves
         .spritesheet(
-          ng-repeat='spritesheet in spritesheets'
+          ng-repeat='(id, spritesheet) in spritesheets'
           ng-click='$parent.selected = spritesheet.id'
           ng-class='{selected: $parent.selected == spritesheet.id}'
         )
