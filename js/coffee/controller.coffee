@@ -210,8 +210,10 @@ app.controller 'appCtrl', [
           actions : []
           $sb_currentAction : 0
           $sb_currentFrame : 0
+          $sb_listOpen : true
         # select new input
         $timeout ->
+
           spriteIndex = scope.sprites.length - 1
           $('.sprite_header input')
           .eq(scope.sprites.length - 1)
@@ -245,6 +247,8 @@ app.controller 'appCtrl', [
         name         : 'action'
         frames       : []
         $sb_currentFrame : 0
+        $sb_listOpen : true
+      scope.sprites[spriteIndex].$sb_listOpen = true
       # select new input
       $timeout ->
         actionIndex = scope.sprites[spriteIndex].actions.length - 1
@@ -262,6 +266,8 @@ app.controller 'appCtrl', [
         scope.sprites[spriteIndex].actions[actionIndex].frames.push []
         frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length-1
         scope.setSelected spriteIndex, actionIndex, frameIndex
+        scope.sprites[spriteIndex].$sb_listOpen = true
+        scope.sprites[spriteIndex].actions[actionIndex].$sb_listOpen = true
         $timeout ->
           $timeout ->
             scrollToListElement spriteIndex, actionIndex, frameIndex

@@ -330,7 +330,8 @@ GLOBAL UTIL
             name: 'sprite',
             actions: [],
             $sb_currentAction: 0,
-            $sb_currentFrame: 0
+            $sb_currentFrame: 0,
+            $sb_listOpen: true
           });
           return $timeout(function() {
             var spriteIndex;
@@ -391,8 +392,10 @@ GLOBAL UTIL
         scope.sprites[spriteIndex].actions.push(self = {
           name: 'action',
           frames: [],
-          $sb_currentFrame: 0
+          $sb_currentFrame: 0,
+          $sb_listOpen: true
         });
+        scope.sprites[spriteIndex].$sb_listOpen = true;
         return $timeout(function() {
           var actionIndex;
           actionIndex = scope.sprites[spriteIndex].actions.length - 1;
@@ -409,6 +412,8 @@ GLOBAL UTIL
           scope.sprites[spriteIndex].actions[actionIndex].frames.push([]);
           frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length - 1;
           scope.setSelected(spriteIndex, actionIndex, frameIndex);
+          scope.sprites[spriteIndex].$sb_listOpen = true;
+          scope.sprites[spriteIndex].actions[actionIndex].$sb_listOpen = true;
           return $timeout(function() {
             return $timeout(function() {
               return scrollToListElement(spriteIndex, actionIndex, frameIndex);
