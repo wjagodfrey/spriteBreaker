@@ -404,13 +404,17 @@ GLOBAL UTIL
         return scope.sprites[spriteIndex].actions.splice(actionIndex, 1);
       };
       scope.addFrame = function(spriteIndex, actionIndex) {
-        var frameIndex;
-        scope.sprites[spriteIndex].actions[actionIndex].frames.push([]);
-        frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length - 1;
-        scope.setSelected(spriteIndex, actionIndex, frameIndex);
-        return $timeout(function() {
-          return scrollToListElement(spriteIndex, actionIndex, frameIndex);
-        });
+        var frameIndex, _ref;
+        if (((_ref = scope.sprites[spriteIndex]) != null ? _ref.actions[actionIndex] : void 0) != null) {
+          scope.sprites[spriteIndex].actions[actionIndex].frames.push([]);
+          frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length - 1;
+          scope.setSelected(spriteIndex, actionIndex, frameIndex);
+          return $timeout(function() {
+            return $timeout(function() {
+              return scrollToListElement(spriteIndex, actionIndex, frameIndex);
+            });
+          });
+        }
       };
       scope.removeFrame = function(spriteIndex, actionIndex, frameIndex) {
         return scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1);
@@ -576,6 +580,13 @@ GLOBAL UTIL
         }
       };
       selectorCq = cq(selectorCanvas[0]).framework({
+        onkeyup: function(key) {
+          if (!$('input:focus, textarea:focus').length) {
+            if (key === 'f') {
+              return scope.addFrame(scope.selectedFrame.sprite, scope.selectedFrame.action);
+            }
+          }
+        },
         onmousemove: function(x, y) {
           selectorMouseCoords = {
             x: x,

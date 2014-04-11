@@ -255,12 +255,14 @@ app.controller 'appCtrl', [
     scope.removeAction = (spriteIndex, actionIndex) ->
       scope.sprites[spriteIndex].actions.splice(actionIndex, 1)
 
-    scope.addFrame = (spriteIndex,actionIndex) ->
-      scope.sprites[spriteIndex].actions[actionIndex].frames.push []
-      frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length-1
-      scope.setSelected spriteIndex, actionIndex, frameIndex
-      $timeout ->
-        scrollToListElement spriteIndex, actionIndex, frameIndex
+    scope.addFrame = (spriteIndex, actionIndex) ->
+      if scope.sprites[spriteIndex]?.actions[actionIndex]?
+        scope.sprites[spriteIndex].actions[actionIndex].frames.push []
+        frameIndex = scope.sprites[spriteIndex].actions[actionIndex].frames.length-1
+        scope.setSelected spriteIndex, actionIndex, frameIndex
+        $timeout ->
+          $timeout ->
+            scrollToListElement spriteIndex, actionIndex, frameIndex
     scope.removeFrame = (spriteIndex, actionIndex, frameIndex) ->
       scope.sprites[spriteIndex].actions[actionIndex].frames.splice(frameIndex, 1)
 
@@ -438,6 +440,12 @@ app.controller 'appCtrl', [
               s[3] = y - s[1]
 
     selectorCq = cq(selectorCanvas[0]).framework
+
+      onkeyup: (key) ->
+        if !$('input:focus, textarea:focus').length
+          if key is 'f'
+            scope.addFrame scope.selectedFrame.sprite, scope.selectedFrame.action
+
       onmousemove: (x, y) ->
         selectorMouseCoords =
           x: x
