@@ -1,0 +1,23 @@
+.modal.ng-cloak(ng-controller='welcomeModalCtrl')#welcome_modal
+  .modal-dialog(ng-click='$event.stopPropagation()')
+    .modal-content
+      .modal-header
+        button.close(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') ×
+        h2.modal-title Welcome to SpriteBreaker!
+      .modal-body
+        span(ng-include='"./includes/about_snippet.html"')
+        p
+        | For an example of what SpriteBreaker can do, load up the demo project and have a look. Otherwise just close this dialog and jump right in.
+        p
+        | Be sure to open the 
+        span.glyphicon.glyphicon-question-sign
+        | &nbsp;Info dialog to learn how to use SpriteBreaker.
+        | You can find the demo at any time in the 
+        span.glyphicon.glyphicon-open
+        | &nbsp;Load dialog.
+
+
+
+      .modal-footer
+        button.btn.btn-primary(type='button' ng-click='loadDemo()') Demo
+        button.btn.btn-default(type='button' ng-click='$parent.$parent.$parent.modalTemplate = false') Close
