@@ -23,6 +23,7 @@ task 'build', 'Watch all jade, stylus and coffeescript files and build appropria
   questTask = exec "
     jade --watch */*.jade *.jade  &
     coffee -w -j js/index.js -c #{jsFiles} &
+    coffee -w -j js/analytics.js -c #{jsPref}analytics.coffee &
     stylus -w css/ && fg
   ", (err, stdout, stderr) ->
     throw err if err
