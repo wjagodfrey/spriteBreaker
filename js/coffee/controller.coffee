@@ -34,6 +34,9 @@ app.controller 'appCtrl', [
     # if the user is new, show them a welcome message
     scope.modalTemplate = if !localStorage?.dontShowWelcomeMessage then './includes/welcome_modal.html' else false
 
+    #DEV
+    # $timeout ->
+      # load '1397171491141'
 
     ###
     LISTENERS
@@ -41,6 +44,7 @@ app.controller 'appCtrl', [
 
     # keep output string updated
     scope.$watch '[sprites, options]', ([sprites, options]) ->
+      # return
       opt = options.output
       #begin output
       output = if opt.naming is 'object' then '{' else '['
@@ -304,7 +308,7 @@ app.controller 'appCtrl', [
       (scope) ->
         localStorage?.dontShowWelcomeMessage = 'true'
         scope.loadDemo = ->
-          load "1397171491141"
+          load '1397171491141'
           scope.$parent.$parent.$parent.modalTemplate = false
     ]
     scope.loadModalCtrl = [
@@ -436,6 +440,10 @@ app.controller 'appCtrl', [
         # left mouse button, set top left frame pos
         if btn is 0
           scope.$apply ->
+            # make sure points never pass each other
+            if s[2]? and s[3]?
+              if x >= s[0] + s[2] then x = s[0] + s[2] - 1
+              if y >= s[1] + s[3] then y = s[1] + s[3] - 1
             # adjust bottom right point
             if s[0]? and s[1]? and s[2]? and s[3]?
               s[2] = (s[0] + s[2]) - x
@@ -445,6 +453,10 @@ app.controller 'appCtrl', [
         # right or middle mouse button, set bottom right frame pos
         if btn in [1,2]
           scope.$apply ->
+            # make sure points never pass each other
+            if s[0]? and s[1]?
+              if x <= s[0] then x = s[0] + 1
+              if y <= s[1] then y = s[1] + 1
             if s[0]? and s[1]?
               s[2] = x - s[0]
               s[3] = y - s[1]
@@ -488,12 +500,17 @@ app.controller 'appCtrl', [
             drawX = navigatorSelection.x - (navigatorSelectionWidth / imgResizeFactor / 2)
             drawY = navigatorSelection.y - (navigatorSelectionHeight / imgResizeFactor / 2)
 
-            @drawImage(
+            transX = if drawX < 0 then Math.abs(drawX) / navigatorSelection.zoom * imgResizeFactor else 0
+            transY = if drawY < 0 then Math.abs(drawY) / navigatorSelection.zoom * imgResizeFactor else 0
+
+            @save()
+            .translate(transX, transY)
+            .drawImage(
               # source
               img,
               # FROM coords and widths
-              drawX,
-              drawY,
+              if transX then 0 else drawX,
+              if transY then 0 else drawY,
               (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor,
               (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor,
               # TO coords and widths
@@ -502,6 +519,7 @@ app.controller 'appCtrl', [
               @canvas.width,
               @canvas.height
             )
+            .restore()
 
             # draw sprite selections
             # return

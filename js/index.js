@@ -5,18 +5,20 @@ GLOBAL UTIL
  */
 
 (function() {
-  var PNGCanvas, app, backgroundTile, drawBackgroundTiles, fileSelect, img, imgResizeFactor, jsonoutput, listElement, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorMouseDown, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, selectorMouseDown, tileImg, tileSource, window_, zoomSpeed;
+  var PNGCanvas, app, backgroundTile, dev_frame, drawBackgroundTiles, fileSelect, img, imgResizeFactor, jsonoutput, listElement, mouseOverNavigator, navigatorCanvas, navigatorCursor, navigatorMouseCoords, navigatorMouseDown, navigatorSelection, reset, selectorCanvas, selectorMouseCoords, selectorMouseDown, tileImg, tileSource, window_, zoomSpeed;
 
   PNGCanvas = cq();
 
   this.getPixelData = function(type, canvas, coords, width, height) {
-    var imgResizeFactor, selectionHeight, selectionWidth, selectionX, selectionY;
+    var imgResizeFactor, selectionHeight, selectionWidth, selectionX, selectionY, transX, transY;
     if (!coords) {
       coords = [];
     }
     selectionX = coords[0] != null ? coords[0] : 0;
     selectionY = coords[1] != null ? coords[1] : 0;
-    selectionWidth = coords[2] != null ? coords[2] : 0;
+    transX = selectionX < 0 ? Math.abs(selectionX) : 0;
+    transY = selectionY < 0 ? Math.abs(selectionY) : 0;
+    selectionWidth = (coords[2] != null ? coords[2] : 0);
     selectionHeight = coords[3] != null ? coords[3] : 0;
     if (width == null) {
       width = selectionWidth;
@@ -27,8 +29,8 @@ GLOBAL UTIL
     PNGCanvas.canvas.width = width;
     PNGCanvas.canvas.height = height;
     PNGCanvas.context.mozImageSmoothingEnabled = PNGCanvas.context.webkitImageSmoothingEnabled = PNGCanvas.context.msImageSmoothingEnabled = PNGCanvas.context.imageSmoothingEnabled = false;
-    imgResizeFactor = Math.min(PNGCanvas.canvas.height / selectionHeight, PNGCanvas.canvas.width / selectionWidth);
-    PNGCanvas.clear().save().translate((PNGCanvas.canvas.width - selectionWidth * imgResizeFactor) / 2, (PNGCanvas.canvas.height - selectionHeight * imgResizeFactor) / 2).drawImage(canvas, selectionX, selectionY, selectionWidth, selectionHeight, 0, 0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor).restore();
+    imgResizeFactor = Math.min(height / selectionHeight, width / selectionWidth);
+    PNGCanvas.clear().save().translate((width - selectionWidth * imgResizeFactor) / 2, (height - selectionHeight * imgResizeFactor) / 2).drawImage(canvas, transX ? 0 : selectionX, transY ? 0 : selectionY, selectionWidth - transX, selectionHeight - transY, transX, transY, (selectionWidth - transX) * imgResizeFactor, (selectionHeight - transY) * imgResizeFactor).restore();
     if (type === 'png') {
       return PNGCanvas.canvas.toDataURL();
     } else {
@@ -39,6 +41,8 @@ GLOBAL UTIL
   window_ = this;
 
   app = angular.module('app', []);
+
+  dev_frame = 0;
 
   zoomSpeed = 0.03;
 
@@ -96,7 +100,9 @@ GLOBAL UTIL
     };
     navigatorSelection = {
       color: '#29a4d3',
-      zoom: 0.3
+      zoom: 0.3,
+      x: 10,
+      y: 10
     };
     navigatorMouseCoords = {
       x: navigatorCanvas.innerWidth / 2,
@@ -461,7 +467,7 @@ GLOBAL UTIL
             localStorage.dontShowWelcomeMessage = 'true';
           }
           return scope.loadDemo = function() {
-            load("1397171491141");
+            load('1397171491141');
             return scope.$parent.$parent.$parent.modalTemplate = false;
           };
         }
@@ -574,6 +580,14 @@ GLOBAL UTIL
           y = Math.floor((y + imgY) / imgResizeFactor * navigatorSelection.zoom);
           if (btn === 0) {
             scope.$apply(function() {
+              if ((s[2] != null) && (s[3] != null)) {
+                if (x >= s[0] + s[2]) {
+                  x = s[0] + s[2] - 1;
+                }
+                if (y >= s[1] + s[3]) {
+                  y = s[1] + s[3] - 1;
+                }
+              }
               if ((s[0] != null) && (s[1] != null) && (s[2] != null) && (s[3] != null)) {
                 s[2] = (s[0] + s[2]) - x;
                 s[3] = (s[1] + s[3]) - y;
@@ -584,6 +598,14 @@ GLOBAL UTIL
           }
           if (btn === 1 || btn === 2) {
             return scope.$apply(function() {
+              if ((s[0] != null) && (s[1] != null)) {
+                if (x <= s[0]) {
+                  x = s[0] + 1;
+                }
+                if (y <= s[1]) {
+                  y = s[1] + 1;
+                }
+              }
               if ((s[0] != null) && (s[1] != null)) {
                 s[2] = x - s[0];
                 return s[3] = y - s[1];
@@ -617,7 +639,7 @@ GLOBAL UTIL
           return navigatorMouseDown = false;
         },
         onrender: function(delta, time) {
-          var action, actionIndex, drawX, drawY, frame, frameColor, frameIndex, frmHeight, frmWidth, frmX, frmY, selected, sprite, spriteIndex, _ref, _results;
+          var action, actionIndex, drawX, drawY, frame, frameColor, frameIndex, frmHeight, frmWidth, frmX, frmY, selected, sprite, spriteIndex, transX, transY, _ref, _results;
           this.context.mozImageSmoothingEnabled = this.context.webkitImageSmoothingEnabled = this.context.msImageSmoothingEnabled = this.context.imageSmoothingEnabled = false;
           this.clear();
           drawBackgroundTiles(this, navigatorSelection.zoom);
@@ -625,7 +647,9 @@ GLOBAL UTIL
             if ((navigatorSelection.x != null) && (navigatorSelection.y != null)) {
               drawX = navigatorSelection.x - (navigatorSelectionWidth / imgResizeFactor / 2);
               drawY = navigatorSelection.y - (navigatorSelectionHeight / imgResizeFactor / 2);
-              this.drawImage(img, drawX, drawY, (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor, (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor, 0, 0, this.canvas.width, this.canvas.height);
+              transX = drawX < 0 ? Math.abs(drawX) / navigatorSelection.zoom * imgResizeFactor : 0;
+              transY = drawY < 0 ? Math.abs(drawY) / navigatorSelection.zoom * imgResizeFactor : 0;
+              this.save().translate(transX, transY).drawImage(img, transX ? 0 : drawX, transY ? 0 : drawY, (selectorCanvas.width() * navigatorSelection.zoom) / imgResizeFactor, (selectorCanvas.height() * navigatorSelection.zoom) / imgResizeFactor, 0, 0, this.canvas.width, this.canvas.height).restore();
               _ref = scope.sprites;
               _results = [];
               for (spriteIndex in _ref) {

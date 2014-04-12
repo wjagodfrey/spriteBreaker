@@ -7,8 +7,12 @@ PNGCanvas = cq()
   if !coords then coords = []
   selectionX = if coords[0]? then coords[0] else 0
   selectionY = if coords[1]? then coords[1] else 0
+  
+  transX = if selectionX < 0 then Math.abs(selectionX) else 0
+  transY = if selectionY < 0 then Math.abs(selectionY) else 0
+
   # have to make sure not to overwrite 0s
-  selectionWidth = if coords[2]? then coords[2] else 0
+  selectionWidth = (if coords[2]? then coords[2] else 0)
   selectionHeight = if coords[3]? then coords[3] else 0
 
   width ?= selectionWidth
@@ -23,13 +27,25 @@ PNGCanvas = cq()
   PNGCanvas.context.msImageSmoothingEnabled =
   PNGCanvas.context.imageSmoothingEnabled = false
 
-  imgResizeFactor = Math.min(PNGCanvas.canvas.height/selectionHeight, PNGCanvas.canvas.width/selectionWidth)
+  imgResizeFactor = Math.min(height / selectionHeight, width / selectionWidth)
 
   PNGCanvas
   .clear()
   .save()
-  .translate((PNGCanvas.canvas.width-selectionWidth*imgResizeFactor)/2, (PNGCanvas.canvas.height-selectionHeight*imgResizeFactor)/2)
-  .drawImage(canvas, selectionX,selectionY, selectionWidth, selectionHeight, 0,0, selectionWidth * imgResizeFactor, selectionHeight * imgResizeFactor)
+  .translate(
+    ((width-selectionWidth*imgResizeFactor)/2)
+    ((height-selectionHeight*imgResizeFactor)/2)
+  )
+  .drawImage(
+    canvas
+    if transX then 0 else selectionX
+    if transY then 0 else selectionY
+    selectionWidth - transX
+    selectionHeight - transY
+    transX,transY
+    (selectionWidth - transX) * imgResizeFactor
+    (selectionHeight - transY) * imgResizeFactor
+  )
   .restore()
 
   if type is 'png'

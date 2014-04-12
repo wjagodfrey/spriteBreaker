@@ -166,6 +166,9 @@ list_caret.open::before,
 #list_wrapper .frame_header.selected {
   background: #e5f9c2;
 }
+#list_wrapper .frame_header img {
+  background-color: #fff;
+}
 .modal {
   display: block !important;
 }
