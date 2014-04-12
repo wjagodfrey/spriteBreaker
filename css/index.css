@@ -232,6 +232,10 @@ list_caret.open::before,
 #load_modal .spritesheet.selected img {
   border-color: #fd9b1f;
 }
+#footer {
+  font-size: 0.8em;
+  color: #6b6760;
+}
 .modal-backdrop {
   position: absolute;
   top: 0;
