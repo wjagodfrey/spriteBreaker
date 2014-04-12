@@ -31,6 +31,10 @@ app.controller 'appCtrl', [
       action : 0
       frame  : 0
 
+    # if the user is new, show them a welcome message
+    scope.modalTemplate = if !localStorage?.dontShowWelcomeMessage then './includes/welcome_modal.html' else false
+
+
     ###
     LISTENERS
     ###
@@ -270,10 +274,24 @@ app.controller 'appCtrl', [
         localSpritesheets[spritesheet.id] = spritesheet
         localStorage.spritesheets = JSON.stringify( localSpritesheets )
 
+    load = scope.load = (id) ->
+      if localStorage?
+        spritesheets = JSON.parse(localStorage.spritesheets)
+        sheet = spritesheets[id]
+        if sheet?
+          parentScope = scope
+          parentScope.spritesheetID = id
+          parentScope.imagedata     = sheet.image
+          parentScope.sprites       = sheet.sprites
+          parentScope.options       = sheet.options
+          parentScope.modalTemplate      = false
+          # make sure reloading doesn't load in the previous spritesheet
+          fileSelect[0].value = ''
+
     ###
     CONTROLLERS
     ###
-    scope.outputOptionsCtrl = [
+    scope.optionsModalCtrl = [
       '$scope'
       (scope) ->
         scope.optionsCache = $.extend true, {}, scope.$parent.$parent.options
@@ -281,9 +299,13 @@ app.controller 'appCtrl', [
           $.extend scope.$parent.$parent.options, scope.optionsCache
           scope.$parent.$parent.$parent.modalTemplate = false
     ]
-    scope.infoModalCtrl = [
+    scope.welcomeModalCtrl = [
       '$scope'
       (scope) ->
+        localStorage?.dontShowWelcomeMessage = 'true'
+        scope.loadDemo = ->
+          load "1397171491141"
+          scope.$parent.$parent.$parent.modalTemplate = false
     ]
     scope.loadModalCtrl = [
       '$scope'
@@ -301,15 +323,7 @@ app.controller 'appCtrl', [
           if scope.selected is id then scope.selected = false
 
         scope.load = (id) ->
-          sheet = scope.spritesheets[id]
-          parentScope = scope.$parent.$parent.$parent
-          parentScope.spritesheetID = id
-          parentScope.imagedata     = sheet.image
-          parentScope.sprites       = sheet.sprites
-          parentScope.options       = sheet.options
-          parentScope.modalTemplate      = false
-          # make sure reloading doesn't load in the previous spritesheet
-          fileSelect[0].value = ''
+          load id
     ]
 
     ###
