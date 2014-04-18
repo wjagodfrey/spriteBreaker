@@ -2,7 +2,7 @@ require 'colors'
 connect = require("connect")
 fs      = require 'fs'
 {exec}  = require 'child_process'
-
+port = 8000
 
 ###
   build task
@@ -36,5 +36,5 @@ task 'build', 'Watch all jade, stylus and coffeescript files and build appropria
 ###
 
 task 'start', 'Start a simple python HTTP file server', (options) ->
-  console.log 'Starting dev server on port'.cyan.bold, '8000'.red
-  connect.createServer(connect.static(__dirname)).listen 8000
+  console.log 'Starting dev server on port'.cyan.bold, "#{port}".red
+  connect.createServer(connect.static(__dirname)).listen port

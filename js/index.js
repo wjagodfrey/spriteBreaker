@@ -147,54 +147,59 @@ GLOBAL UTIL
       /*
       LISTENERS
        */
-      scope.$watch('[sprites, options]', function(_arg) {
-        var action, ai, fi, frame, opt, options, output, si, sprite, sprites, _ref, _ref1, _ref2;
-        sprites = _arg[0], options = _arg[1];
-        opt = options.output;
-        output = opt.naming === 'object' ? '{' : '[';
-
-        /*
-        sprite loop
-         */
-        _ref = scope.sprites;
-        for (si in _ref) {
-          sprite = _ref[si];
-          si = parseInt(si);
-          output += opt.naming === 'object' ? "'" + sprite.name + "':{'actions':{" : "{'name':'" + sprite.name + "','actions':[";
-
-          /*
-          action loop
-           */
-          _ref1 = sprite.actions;
-          for (ai in _ref1) {
-            action = _ref1[ai];
-            ai = parseInt(ai);
-            output += opt.naming === 'object' ? "'" + action.name + "':{'frames':[" : "{'name':'" + action.name + "','frames':[";
+      scope.$watch('[sprites, options, imagedata]', function(_arg) {
+        var imagedata, options, sprites;
+        sprites = _arg[0], options = _arg[1], imagedata = _arg[2];
+        if (imagedata) {
+          return $timeout(function() {
+            var action, ai, fi, frame, opt, output, si, sprite, _ref, _ref1, _ref2;
+            opt = options.output;
+            output = opt.naming === 'object' ? '{' : '[';
 
             /*
-            frame loop
+            sprite loop
              */
-            _ref2 = action.frames;
-            for (fi in _ref2) {
-              frame = _ref2[fi];
-              fi = parseInt(fi);
-              output += (opt.frame === 'array' ? "" + (JSON.stringify(frame)) : opt.frame === 'object' ? "{'x':" + frame[0] + ",'y':" + frame[1] + ",'width':" + frame[2] + ",'height':" + frame[3] + "}" : opt.frame === 'png' ? "'" + (getPixelData('png', img, frame)) + "'" : opt.frame === 'image' ? "" + (JSON.stringify(getPixelData('img', img, frame))) : void 0);
-              if (fi !== action.frames.length - 1) {
+            _ref = scope.sprites;
+            for (si in _ref) {
+              sprite = _ref[si];
+              si = parseInt(si);
+              output += opt.naming === 'object' ? "'" + sprite.name + "':{'actions':{" : "{'name':'" + sprite.name + "','actions':[";
+
+              /*
+              action loop
+               */
+              _ref1 = sprite.actions;
+              for (ai in _ref1) {
+                action = _ref1[ai];
+                ai = parseInt(ai);
+                output += opt.naming === 'object' ? "'" + action.name + "':{'frames':[" : "{'name':'" + action.name + "','frames':[";
+
+                /*
+                frame loop
+                 */
+                _ref2 = action.frames;
+                for (fi in _ref2) {
+                  frame = _ref2[fi];
+                  fi = parseInt(fi);
+                  output += (opt.frame === 'array' ? "" + (JSON.stringify(frame)) : opt.frame === 'object' ? "{'x':" + frame[0] + ",'y':" + frame[1] + ",'width':" + frame[2] + ",'height':" + frame[3] + "}" : opt.frame === 'png' ? "'" + (getPixelData('png', img, frame)) + "'" : opt.frame === 'image' ? "" + (JSON.stringify(getPixelData('img', img, frame))) : void 0);
+                  if (fi !== action.frames.length - 1) {
+                    output += ',';
+                  }
+                }
+                output += opt.naming === 'object' ? ']}' : ']}';
+                if (ai !== sprite.actions.length - 1) {
+                  output += ',';
+                }
+              }
+              output += opt.naming === 'object' ? '}}' : ']}';
+              if (si !== scope.sprites.length - 1) {
                 output += ',';
               }
             }
-            output += opt.naming === 'object' ? ']}' : ']}';
-            if (ai !== sprite.actions.length - 1) {
-              output += ',';
-            }
-          }
-          output += opt.naming === 'object' ? '}}' : ']}';
-          if (si !== scope.sprites.length - 1) {
-            output += ',';
-          }
+            output += opt.naming === 'object' ? '}' : ']';
+            return scope.output = output.replace(/\'/g, '"');
+          });
         }
-        output += opt.naming === 'object' ? '}' : ']';
-        return scope.output = output.replace(/\'/g, '"');
       }, true);
       scope.$watch('imagedata', function(imagedata) {
         if (imagedata != null) {

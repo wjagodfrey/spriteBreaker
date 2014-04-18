@@ -43,51 +43,53 @@ app.controller 'appCtrl', [
     ###
 
     # keep output string updated
-    scope.$watch '[sprites, options]', ([sprites, options]) ->
-      # return
-      opt = options.output
-      #begin output
-      output = if opt.naming is 'object' then '{' else '['
-      ###
-      sprite loop
-      ###
-      for si, sprite of scope.sprites
-        si = parseInt si
-        # begin sprite
-        output += if opt.naming is 'object' then "'#{sprite.name}':{'actions':{" else "{'name':'#{sprite.name}','actions':["
-        ###
-        action loop
-        ###
-        for ai, action of sprite.actions
-          ai = parseInt ai
-          # begin action
-          output += if opt.naming is 'object' then "'#{action.name}':{'frames':[" else "{'name':'#{action.name}','frames':["
+    scope.$watch '[sprites, options, imagedata]', ([sprites, options, imagedata]) ->
+      if imagedata
+        $timeout ->
+          # return
+          opt = options.output
+          #begin output
+          output = if opt.naming is 'object' then '{' else '['
           ###
-          frame loop
+          sprite loop
           ###
-          for fi, frame of action.frames
-            fi = parseInt fi
-            # frame
-            output += (
-              if opt.frame is 'array'
-                "#{JSON.stringify frame}"
-              else if opt.frame is 'object'
-                "{'x':#{frame[0]},'y':#{frame[1]},'width':#{frame[2]},'height':#{frame[3]}}"
-              else if opt.frame is 'png'
-                "'#{getPixelData 'png', img, frame}'"
-              else if opt.frame is 'image'
-                "#{JSON.stringify getPixelData('img', img, frame)}"
-            )
-            if fi isnt action.frames.length-1 then output += ','
-          # close action
-          output += if opt.naming is 'object' then ']}' else ']}'
-          if ai isnt sprite.actions.length-1 then output += ','
-        # close sprite
-        output += if opt.naming is 'object' then '}}' else ']}'
-        if si isnt scope.sprites.length-1 then output += ','
-      # close output
-      output += if opt.naming is 'object' then '}' else ']'
-      scope.output = output.replace /\'/g, '"'
+          for si, sprite of scope.sprites
+            si = parseInt si
+            # begin sprite
+            output += if opt.naming is 'object' then "'#{sprite.name}':{'actions':{" else "{'name':'#{sprite.name}','actions':["
+            ###
+            action loop
+            ###
+            for ai, action of sprite.actions
+              ai = parseInt ai
+              # begin action
+              output += if opt.naming is 'object' then "'#{action.name}':{'frames':[" else "{'name':'#{action.name}','frames':["
+              ###
+              frame loop
+              ###
+              for fi, frame of action.frames
+                fi = parseInt fi
+                # frame
+                output += (
+                  if opt.frame is 'array'
+                    "#{JSON.stringify frame}"
+                  else if opt.frame is 'object'
+                    "{'x':#{frame[0]},'y':#{frame[1]},'width':#{frame[2]},'height':#{frame[3]}}"
+                  else if opt.frame is 'png'
+                    "'#{getPixelData 'png', img, frame}'"
+                  else if opt.frame is 'image'
+                    "#{JSON.stringify getPixelData('img', img, frame)}"
+                )
+                if fi isnt action.frames.length-1 then output += ','
+              # close action
+              output += if opt.naming is 'object' then ']}' else ']}'
+              if ai isnt sprite.actions.length-1 then output += ','
+            # close sprite
+            output += if opt.naming is 'object' then '}}' else ']}'
+            if si isnt scope.sprites.length-1 then output += ','
+          # close output
+          output += if opt.naming is 'object' then '}' else ']'
+          scope.output = output.replace /\'/g, '"'
     , true
 
     # watch imagedata input for new imagedata
