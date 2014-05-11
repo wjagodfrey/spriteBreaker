@@ -578,4 +578,4 @@ app.controller 'appCtrl', [
 ]
 
 angular.element(window_.document).ready ->
-  angular.bootstrap window_.document.body, ["app"]
+  angular.bootstrap window_.document, ["app"]

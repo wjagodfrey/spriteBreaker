@@ -729,7 +729,7 @@ GLOBAL UTIL
   ]);
 
   angular.element(window_.document).ready(function() {
-    return angular.bootstrap(window_.document.body, ["app"]);
+    return angular.bootstrap(window_.document, ["app"]);
   });
 
 }).call(this);
