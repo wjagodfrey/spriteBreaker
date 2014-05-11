@@ -114,7 +114,7 @@ GLOBAL UTIL
     };
   };
 
-  angular.bootstrap(root.document.body, ["app"]);
+  angular.bootstrap(window_.document.body, ["app"]);
 
   app.controller('appCtrl', [
     '$scope', '$timeout', '$interval', function(scope, $timeout, $interval) {

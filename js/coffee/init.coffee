@@ -65,4 +65,4 @@ reset = ->
     x: 0
     y: 0
 
-angular.bootstrap root.document.body, ["app"]
+angular.bootstrap window_.document.body, ["app"]
