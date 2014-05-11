@@ -7,111 +7,111 @@ html()
     link(rel="stylesheet" type="text/css" href="/css/nav.css")
     link(rel="stylesheet" type="text/css" href="./css/index.css")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
-  body(ng-class="{'modal-open': modalTemplate}" ng-controller="appCtrl")
+  body(ng-class="{'modal-open': modalTemplate}")
+    div(ng-app="sbApp" ng-controller="appCtrl")
+      //- offscreen elements
+      .offscreen_hide
+        input(type='file', accept='image/*')#filepath
+      //- wrapper
+      .container.ng-cloak
+        .row
+          //- left col
+          .col-xs-7
+            //- top row
+            .row
+              .col-xs-12
+                canvas#selector
+            //- bottom row
+            .row
+              //- bottom left navigator
+              .col-xs-6#navigator_wrapper
+                canvas#navigator
+              //- bottom left navigator
+              .col-xs-6(style='padding:0 5px')
+                form#form
 
-    //- offscreen elements
-    .offscreen_hide
-      input(type='file', accept='image/*')#filepath
-    //- wrapper
-    .container.ng-cloak
-      .row
-        //- left col
-        .col-xs-7
-          //- top row
-          .row
-            .col-xs-12
-              canvas#selector
-          //- bottom row
-          .row
-            //- bottom left navigator
-            .col-xs-6#navigator_wrapper
-              canvas#navigator
-            //- bottom left navigator
-            .col-xs-6(style='padding:0 5px')
-              form#form
+                  //- label output
+                  .input-group(style='padding-top:0')
+                    .input-group-addon
+                      span.glyphicon.glyphicon-circle-arrow-down
+                    textarea(type='text' ng-model='output').form-control.click-select#output
+                  .input-group(style='padding-top:7px')
 
-                //- label output
-                .input-group(style='padding-top:0')
-                  .input-group-addon
-                    span.glyphicon.glyphicon-circle-arrow-down
-                  textarea(type='text' ng-model='output').form-control.click-select#output
-                .input-group(style='padding-top:7px')
+                    .btn-group(style='margin:0 2px')
+                      button(type='button' ng-click='newSpritesheet()' title='New spritesheet').btn.btn-sm.btn-primary
+                        span.glyphicon.glyphicon-folder-open
+                      button(type='button' ng-click='updateSpritesheet()' ng-disabled='!imagedata' title='Update spritesheet').btn.btn-sm.btn-primary
+                        span.glyphicon.glyphicon-repeat
 
-                  .btn-group(style='margin:0 2px')
-                    button(type='button' ng-click='newSpritesheet()' title='New spritesheet').btn.btn-sm.btn-primary
-                      span.glyphicon.glyphicon-folder-open
-                    button(type='button' ng-click='updateSpritesheet()' ng-disabled='!imagedata' title='Update spritesheet').btn.btn-sm.btn-primary
-                      span.glyphicon.glyphicon-repeat
+                    .btn-group(style='margin:0 2px')
+                      button(type='button' ng-click='save()' ng-disabled='!imagedata' title='Save').btn.btn-sm.btn-primary
+                        span.glyphicon.glyphicon-floppy-disk
+                      button(type='button' ng-click='modalTemplate = "./includes/load_modal.html"' title='Load').btn.btn-sm.btn-primary
+                        span.glyphicon.glyphicon-open
 
-                  .btn-group(style='margin:0 2px')
-                    button(type='button' ng-click='save()' ng-disabled='!imagedata' title='Save').btn.btn-sm.btn-primary
-                      span.glyphicon.glyphicon-floppy-disk
-                    button(type='button' ng-click='modalTemplate = "./includes/load_modal.html"' title='Load').btn.btn-sm.btn-primary
-                      span.glyphicon.glyphicon-open
+                    .btn-group(style='margin:0 2px')
+                      button(type='button' ng-click='modalTemplate = "./includes/info_modal.html"' title='Info').btn.btn-sm.btn-info
+                        span.glyphicon.glyphicon-question-sign
+                      button(type='button' ng-click='modalTemplate = "./includes/options_modal.html"' ng-disabled='!imagedata' title='Settings').btn.btn-sm.btn-info
+                        span.glyphicon.glyphicon-cog
 
-                  .btn-group(style='margin:0 2px')
-                    button(type='button' ng-click='modalTemplate = "./includes/info_modal.html"' title='Info').btn.btn-sm.btn-info
-                      span.glyphicon.glyphicon-question-sign
-                    button(type='button' ng-click='modalTemplate = "./includes/options_modal.html"' ng-disabled='!imagedata' title='Settings').btn.btn-sm.btn-info
-                      span.glyphicon.glyphicon-cog
-
-        //- right col
-        .col-xs-5#list_wrapper
-          #list
-            div(
-              ng-repeat='(spriteIndex, sprite) in sprites'
-            ).sprite
-
-              .sprite_header(
-                ng-click='sprite.$sb_listOpen = !sprite.$sb_listOpen'
-                ng-class='{open:sprite.$sb_listOpen}'
-              )
-                input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control.click-select
-                .button_wrapper
-                  button(type='button' ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
-                  button(type='button' ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
-                img(ng-src='{{getFrameImage(sprite.actions[sprite.$sb_currentAction].frames[sprite.$sb_currentFrame], 50, 50)}}')
+          //- right col
+          .col-xs-5#list_wrapper
+            #list
               div(
-                ng-repeat='(actionIndex, action) in sprite.actions'
-                ng-show='$parent.sprite.$sb_listOpen'
-              ).action
+                ng-repeat='(spriteIndex, sprite) in sprites'
+              ).sprite
 
-                .action_header(
-                  ng-click='action.$sb_listOpen = !action.$sb_listOpen'
-                  ng-class='{open:action.$sb_listOpen}'
+                .sprite_header(
+                  ng-click='sprite.$sb_listOpen = !sprite.$sb_listOpen'
+                  ng-class='{open:sprite.$sb_listOpen}'
                 )
-                  input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control.click-select
-                  img(ng-src='{{getFrameImage(action.frames[action.$sb_currentFrame], 50, 50)}}')
+                  input(type='text' ng-model='sprite.name' ng-click='$event.stopPropagation()').form-control.click-select
                   .button_wrapper
-                    button(type='button' ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
-                    button(type='button' ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
+                    button(type='button' ng-click='$event.stopPropagation(); removeSprite(spriteIndex)').btn.btn-xs.btn-danger -
+                    button(type='button' ng-click='$event.stopPropagation(); addAction(spriteIndex)').btn.btn-xs.btn-info + action
+                  img(ng-src='{{getFrameImage(sprite.actions[sprite.$sb_currentAction].frames[sprite.$sb_currentFrame], 50, 50)}}')
                 div(
-                  ng-repeat="(frameIndex, frameData) in action.frames"
-                  ng-show='$parent.action.$sb_listOpen'
-                ).frame
+                  ng-repeat='(actionIndex, action) in sprite.actions'
+                  ng-show='$parent.sprite.$sb_listOpen'
+                ).action
 
-                  .frame_header(
-                    ng-click='setSelected(spriteIndex,actionIndex,frameIndex)'
-                    ng-class='{selected:isSelected(spriteIndex, actionIndex, frameIndex)}'
+                  .action_header(
+                    ng-click='action.$sb_listOpen = !action.$sb_listOpen'
+                    ng-class='{open:action.$sb_listOpen}'
                   )
-                    img(ng-src='{{getFrameImage(frameData, 50, 50)}}')
+                    input(type='text' ng-model='action.name' ng-click='$event.stopPropagation()').form-control.click-select
+                    img(ng-src='{{getFrameImage(action.frames[action.$sb_currentFrame], 50, 50)}}')
                     .button_wrapper
-                      button(type='button' ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
+                      button(type='button' ng-click='$event.stopPropagation(); removeAction(spriteIndex, actionIndex)').btn.btn-xs.btn-danger -
+                      button(type='button' ng-click='$event.stopPropagation(); addFrame(spriteIndex, actionIndex)').btn.btn-xs.btn-info + frame
+                  div(
+                    ng-repeat="(frameIndex, frameData) in action.frames"
+                    ng-show='$parent.action.$sb_listOpen'
+                  ).frame
 
-          button(type='button' ng-disabled='!imagedata' ng-click='addSprite()').btn.btn-info#add_sprite
-            .span.glyphicon.glyphicon-plus-sign
-            | &nbsp; sprite
-      .row#footer
-        .col-xs-12
-          | <em><strong>v0.0.2-alpha</strong></em> 
-          small Please report any issues <a href='https://github.com/wilfredjamesgodfrey/spriteBreaker/issues' target='_blank'>on github</a>.
+                    .frame_header(
+                      ng-click='setSelected(spriteIndex,actionIndex,frameIndex)'
+                      ng-class='{selected:isSelected(spriteIndex, actionIndex, frameIndex)}'
+                    )
+                      img(ng-src='{{getFrameImage(frameData, 50, 50)}}')
+                      .button_wrapper
+                        button(type='button' ng-click='$event.stopPropagation(); removeFrame(spriteIndex, actionIndex, frameIndex)').btn.btn-xs.btn-danger -
+
+            button(type='button' ng-disabled='!imagedata' ng-click='addSprite()').btn.btn-info#add_sprite
+              .span.glyphicon.glyphicon-plus-sign
+              | &nbsp; sprite
+        .row#footer
+          .col-xs-12
+            | <em><strong>v0.0.2-alpha</strong></em> 
+            small Please report any issues <a href='https://github.com/wilfredjamesgodfrey/spriteBreaker/issues' target='_blank'>on github</a>.
 
 
-    .modal-backdrop(
-      ng-if='modalTemplate'
-      ng-click='')
-    //- output options modal
-    span(ng-if='modalTemplate' ng-include='modalTemplate' ng-click='$parent.$parent.modalTemplate = false')
+      .modal-backdrop(
+        ng-if='modalTemplate'
+        ng-click='')
+      //- output options modal
+      span(ng-if='modalTemplate' ng-include='modalTemplate' ng-click='$parent.$parent.modalTemplate = false')
 
 
 
@@ -121,6 +121,6 @@ html()
     script(src='./js/jquery.mousewheel.js')
     script(src='./js/canvasquery.js')
     script(src='./js/canvasquery.framework.js')
-    script(src='/js/nav.js')
     script(src='./js/index.js')
+    script(src='/js/nav.js')
 

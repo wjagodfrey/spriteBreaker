@@ -728,8 +728,4 @@ GLOBAL UTIL
     }
   ]);
 
-  angular.element(window_.document).ready(function() {
-    return angular.bootstrap(window_.document.body, ["sbApp"]);
-  });
-
 }).call(this);
