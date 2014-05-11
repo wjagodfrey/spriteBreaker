@@ -112,7 +112,7 @@ html()
         ng-click='')
       //- output options modal
       span(ng-if='modalTemplate' ng-include='modalTemplate' ng-click='$parent.$parent.modalTemplate = false')
-    div(ng-app="navApp")
+    div#wg-nav-app
 
 
     script(src='/js/analytics.js')
