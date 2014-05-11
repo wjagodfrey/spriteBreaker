@@ -1,6 +1,6 @@
 window_ = @
 
-app = angular.module 'app', []
+app = angular.module 'sbApp', []
 
 
 # DEV

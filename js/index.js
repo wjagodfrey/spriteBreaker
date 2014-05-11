@@ -40,7 +40,7 @@ GLOBAL UTIL
 
   window_ = this;
 
-  app = angular.module('app', []);
+  app = angular.module('sbApp', []);
 
   dev_frame = 0;
 
@@ -729,7 +729,7 @@ GLOBAL UTIL
   ]);
 
   angular.element(window_.document).ready(function() {
-    return angular.bootstrap(window_.document, ["app"]);
+    return angular.bootstrap(window_.document.body, ["sbApp"]);
   });
 
 }).call(this);
