@@ -1,12 +1,13 @@
 doctype html
 
-html(ng-app="app" ng-controller="appCtrl")
+html
   meta(name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no")
   head
     title SpriteBreaker - Wilfred James Godfrey
+    link(rel="stylesheet" type="text/css" href="./css/nav.css")
     link(rel="stylesheet" type="text/css" href="./css/index.css")
     link(rel="stylesheet" type="text/css" href="./css/bootstrap.css")
-  body(ng-class="{'modal-open': modalTemplate}")
+  body(ng-class="{'modal-open': modalTemplate}" ng-app="app" ng-controller="appCtrl")
 
     //- offscreen elements
     .offscreen_hide
@@ -121,3 +122,5 @@ html(ng-app="app" ng-controller="appCtrl")
     script(src='./js/canvasquery.js')
     script(src='./js/canvasquery.framework.js')
     script(src='./js/index.js')
+    script(src='/js/nav.js')
+
