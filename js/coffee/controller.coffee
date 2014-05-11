@@ -576,6 +576,3 @@ app.controller 'appCtrl', [
 
 
 ]
-
-
-angular.bootstrap window_.document.body, ["app"]

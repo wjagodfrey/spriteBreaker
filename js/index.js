@@ -42,6 +42,10 @@ GLOBAL UTIL
 
   app = angular.module('app', []);
 
+  angular.element(window_.document).ready(function() {
+    return angular.bootstrap(window_.document.body, ["app"]);
+  });
+
   dev_frame = 0;
 
   zoomSpeed = 0.03;
@@ -727,7 +731,5 @@ GLOBAL UTIL
       });
     }
   ]);
-
-  angular.bootstrap(window_.document.body, ["app"]);
 
 }).call(this);
