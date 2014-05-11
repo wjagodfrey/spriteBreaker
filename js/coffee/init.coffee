@@ -64,3 +64,5 @@ reset = ->
   selectorMouseCoords =
     x: 0
     y: 0
+
+angular.bootstrap root.document.body, ["app"]
